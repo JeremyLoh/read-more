@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <!-- Card View for Article -->
+    <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/articleCardView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        card_view:cardCornerRadius="4dp">
+
+        <LinearLayout
+            android:id="@+id/articleLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <!-- Image -->
+            <ImageView
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_launcher_background"
+                android:id="@+id/articleImageView"
+                android:layout_width="match_parent"
+                android:layout_weight="2"
+                android:layout_height="0dp" />
+            <!-- Title of Article -->
+            <TextView
+                android:text="ARTICLE TITLE"
+                android:id="@+id/articleTitleTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <!-- Text from Article -->
+            <TextView
+                android:text="ARTICLE TEXT"
+                android:id="@+id/articleContentTextView"
+                android:layout_width="match_parent"
+                android:layout_weight="3"
+                android:layout_height="0dp" />
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
+    <!-- Previous/Next Article buttons -->
+    <LinearLayout
+        android:id="@+id/changeArticleLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:padding="16sp"
+            android:layout_marginLeft="16sp"
+            android:text="@string/previous_article_text"
+            android:id="@+id/previousArticleBtn"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:drawableStart="@drawable/ic_arrow_upward_black_24dp"
+            android:layout_height="wrap_content" />
+        <Button
+            android:onClick="abc"
+            android:padding="16sp"
+            android:layout_marginRight="16sp"
+            android:text="@string/next_article_text"
+            android:id="@+id/nextArticleBtn"
+            android:layout_weight="1"
+            android:drawableEnd="@drawable/ic_arrow_downward_black_24dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</LinearLayout>
