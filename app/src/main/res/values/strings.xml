@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">ReadMore</string>
+    <string name="app_name">Read More...</string>
+    <string name="homepage_previous_text">Previous</string>
+    <string name="homepage_next_text">Next</string>
 </resources>
