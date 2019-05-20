@@ -24,20 +24,11 @@
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-        <!--where our fragments go-->
         <FrameLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-            <!--testing-->
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:includeFontPadding="false"
-                android:text="HIIIIIIIIIIIIIIIIIIIIIIIIIII"
-                android:textColorLink="#00161515"
-                android:textSize="20sp" />
+            android:layout_height="match_parent">
+
         </FrameLayout>
 
     </LinearLayout>
