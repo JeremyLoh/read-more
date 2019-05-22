@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_vertical"
-    android:padding="16sp">
+    android:padding="16dp">
 
     <LinearLayout
         android:id="@+id/linearLayout1"
@@ -23,6 +23,12 @@
             android:layout_height="wrap_content"
             android:hint="Password"
             android:inputType="textPassword" />
+        <EditText
+            android:id="@+id/register_pwd_check"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Confirm Password"
+            android:inputType="textPassword" />
 
         <EditText
             android:id="@+id/register_email"
@@ -35,17 +41,25 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/linearLayout1"
         android:layout_centerHorizontal="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_marginTop="20dp  ">
 
         <Button
             android:id="@+id/register_btn"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Register" />
+            android:text="Create account" />
+        <TextView
+            android:id="@+id/already_member"
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:gravity="center_horizontal"
+            android:layout_height="wrap_content"
+            android:text="Already a member? Login here"/>
     </LinearLayout>
 
 

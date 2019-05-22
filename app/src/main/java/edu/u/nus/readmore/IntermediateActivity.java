@@ -20,8 +20,6 @@ public class IntermediateActivity extends AppCompatActivity {
         Intent currentIntent = this.getIntent();
 
         if (currentIntent.hasExtra(getString(R.string.login_key))) {
-            // Set name of Action Bar
-            getSupportActionBar().setTitle("Login");
             // Loads LoginFragment
             getSupportFragmentManager()
                     .beginTransaction()
@@ -43,4 +41,5 @@ public class IntermediateActivity extends AppCompatActivity {
         finish();
         return true;
     }
+
 }
