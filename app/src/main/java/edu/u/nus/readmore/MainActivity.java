@@ -1,5 +1,6 @@
 package edu.u.nus.readmore;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -32,23 +33,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                new HomeFragment()).commit();
+    }
+
+    /**
+     * Starts a new Intent, with extra information given based on key and value passed to
+     * Function.
+     * @param key Used to identify intent
+     * @param value Used to identify intent
+     */
+    private void startIntermediateActivity(String key, String value) {
+        Intent startIntent = new Intent(getApplicationContext(), IntermediateActivity.class);
+        startIntent.putExtra(key, value);
+        startActivity(startIntent);
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.nav_login:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new LoginFragment()).commit();
+                String loginKey = getString(R.string.login_key);
+                String loginValue = "login";
+                startIntermediateActivity(loginKey, loginValue);
                 break;
             case R.id.nav_settings:
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new SettingsFragment()).commit();
+                String settingsKey = getString(R.string.settings_key);
+                String settingsValue = "settings";
+                startIntermediateActivity(settingsKey, settingsValue);
                 break;
         }
 
         drawer.closeDrawer(GravityCompat.START);
-
         return true;
     }
 

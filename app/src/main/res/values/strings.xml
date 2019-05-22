@@ -3,5 +3,10 @@
     <!--for actionbartoggle class as input-->
     <string name="navigation_drawer_open">Open Navigation Drawer</string>
     <string name="navigation_drawer_close">Close Navigation Drawer</string>
-
+    <!-- article_interface text -->
+    <string name="next_article_text">next</string>
+    <string name="previous_article_text">previous</string>
+    <!-- Key values for Navigation Drawer Intents -->
+    <string name="login_key">Login</string>
+    <string name="settings_key">Settings</string>
 </resources>
