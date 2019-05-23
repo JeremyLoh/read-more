@@ -65,12 +65,18 @@
             android:layout_weight="1"
             android:text="Sign-up" />
 
-        <Button
+        <!--<Button-->
+            <!--android:id="@+id/google_btn"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="0.5"-->
+            <!--android:text="login with google" />-->
+
+        <com.google.android.gms.common.SignInButton
+            android:layout_weight="1"
             android:id="@+id/google_btn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="login with google" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 

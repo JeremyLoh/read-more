@@ -56,7 +56,6 @@
             android:drawableStart="@drawable/ic_arrow_upward_black_24dp"
             android:layout_height="wrap_content" />
         <Button
-            android:onClick="abc"
             android:padding="16sp"
             android:layout_marginRight="16sp"
             android:text="@string/next_article_text"

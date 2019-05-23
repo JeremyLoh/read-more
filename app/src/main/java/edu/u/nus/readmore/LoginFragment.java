@@ -1,10 +1,12 @@
 package edu.u.nus.readmore;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,9 +14,23 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
+
 public class LoginFragment extends Fragment {
     TextView forgotPW;
-    Button signUpBtn,loginBtn, googleBtn;
+    Button signUpBtn,loginBtn;
+    SignInButton googleBtn;
+    // RC_SIGN_IN is the request code you will assign for starting the new activity.
+    // this can be any number. When the user is done with the subsequent activity and returns,
+    // the system calls your activity's onActivityResult() method.
+    private static final int RC_SIGN_IN = 9001;
+    private static final String TAG = "GoogleLoginActivity";
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -58,7 +74,77 @@ public class LoginFragment extends Fragment {
         });
 
         //setting google-link button
+        googleBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (v.getId()) {
+                    case R.id.google_btn:
+                        signIn();
+                        break;
+                    // ...
+                }
+            }
+        });
+    }
 
+    // Google Account Sign-in
+    private void signIn() {
+        // Configure sign-in to request the user's ID, email address, and basic
+        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        GoogleSignInOptions gso = new GoogleSignInOptions
+                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        // Build a GoogleSignInClient with the options specified by gso.
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
+
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+        }
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+
+            // Signed in successfully, show authenticated UI.
+            updateUI(account);
+        } catch (ApiException e) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+            updateUI(null);
+        }
+    }
+
+    private void updateUI(GoogleSignInAccount account) {
+        if (account == null) {
+            // load default UI
+            // TEMP SET TO LOGIN PAGE
+            Intent loadLoginPage = new Intent(getActivity().getApplicationContext(),
+                    IntermediateActivity.class);
+            loadLoginPage.putExtra(getString(R.string.login_key), "login");
+            startActivity(loadLoginPage);
+        } else {
+            // load google sign-in UI
+            // TEMP SET TO LOGIN PAGE
+            Intent loadLoginPage = new Intent(getActivity().getApplicationContext(),
+                    IntermediateActivity.class);
+            loadLoginPage.putExtra(getString(R.string.login_key), "login");
+            startActivity(loadLoginPage);
+        }
     }
 
     @Nullable
@@ -66,5 +152,4 @@ public class LoginFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_login, container, false);
     }
-
 }
