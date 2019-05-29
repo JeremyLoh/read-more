@@ -8,12 +8,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -22,15 +20,18 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
+
 public class LoginFragment extends Fragment {
     TextView forgotPW;
     Button signUpBtn,loginBtn;
     SignInButton googleBtn;
+
     // RC_SIGN_IN is the request code you will assign for starting the new activity.
     // this can be any number. When the user is done with the subsequent activity and returns,
     // the system calls your activity's onActivityResult() method.
     private static final int RC_SIGN_IN = 9001;
     private static final String TAG = "GoogleLoginActivity";
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -42,13 +43,10 @@ public class LoginFragment extends Fragment {
         loginBtn = getActivity().findViewById(R.id.login_btn);
         googleBtn = getActivity().findViewById(R.id.google_btn);
 
+
+
         //setting login button activity
-//        loginBtn.setOnClickListener(new View.OnClickListener() {set
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
+
 
         //setting sign-up button to RegisterFragment
         signUpBtn.setOnClickListener(new View.OnClickListener() {
@@ -145,7 +143,9 @@ public class LoginFragment extends Fragment {
             loadLoginPage.putExtra(getString(R.string.login_key), "login");
             startActivity(loadLoginPage);
         }
+
     }
+
 
     @Nullable
     @Override
