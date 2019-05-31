@@ -23,7 +23,7 @@ public class IntermediateActivity extends AppCompatActivity {
             // Loads LoginFragment
             getSupportFragmentManager()
                     .beginTransaction()
-                    .add(R.id.intermediate_frame_layout, new LoginFragment())
+                    .replace(R.id.intermediate_frame_layout, new LoginFragment())
                     .commit();
         } else if (currentIntent.hasExtra(getString(R.string.settings_key))) {
             // Set name of Action Bar
@@ -31,7 +31,7 @@ public class IntermediateActivity extends AppCompatActivity {
             // Loads SettingsFragment
             getSupportFragmentManager()
                     .beginTransaction()
-                    .add(R.id.intermediate_frame_layout, new SettingsFragment())
+                    .replace(R.id.intermediate_frame_layout, new SettingsFragment())
                     .commit();
         }
     }
