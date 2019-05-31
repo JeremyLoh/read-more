@@ -6,12 +6,16 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -19,33 +23,48 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+
+import java.util.regex.Pattern;
 
 
 public class LoginFragment extends Fragment {
-    TextView forgotPW;
-    Button signUpBtn,loginBtn;
-    SignInButton googleBtn;
+    private EditText userID, userPassword;
+    private TextView forgotPW;
+    private Button signUpBtn,loginBtn;
+    private SignInButton googleBtn;
+
 
     // RC_SIGN_IN is the request code you will assign for starting the new activity.
     // this can be any number. When the user is done with the subsequent activity and returns,
     // the system calls your activity's onActivityResult() method.
     private static final int RC_SIGN_IN = 9001;
     private static final String TAG = "GoogleLoginActivity";
-
+    private FirebaseAuth mAuth;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         getActivity().setTitle("Login");
+        // Initialize buttons and TextViews
+        userID = getActivity().findViewById(R.id.user_id);
+        userPassword = getActivity().findViewById(R.id.user_pwd);
         forgotPW = getActivity().findViewById(R.id.tv_forgot_pwd);
         signUpBtn = getActivity().findViewById(R.id.signup_btn);
         loginBtn = getActivity().findViewById(R.id.login_btn);
         googleBtn = getActivity().findViewById(R.id.google_btn);
+        mAuth = FirebaseAuth.getInstance();
 
 
 
         //setting login button activity
+        loginBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loginUser();
+            }
+        });
 
 
         //setting sign-up button to RegisterFragment
@@ -83,6 +102,34 @@ public class LoginFragment extends Fragment {
                 }
             }
         });
+    }
+
+    // Method for logging in Users
+    private void loginUser() {
+        String emailRegex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
+        String ID, Password;
+        ID = userID.getText().toString();
+        Password = userPassword.getText().toString();
+
+        if (TextUtils.isEmpty(ID) || !ID.matches(emailRegex)) {
+            Toast.makeText(getActivity().getApplicationContext(),
+                    "Please enter a valid Email",
+                    Toast.LENGTH_SHORT)
+                    .show();
+        }
+
+        if (TextUtils.isEmpty(Password)) {
+            Toast.makeText(getActivity().getApplicationContext(),
+                    "Please enter a Password",
+                    Toast.LENGTH_SHORT)
+                    .show();
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
     }
 
     // Google Account Sign-in

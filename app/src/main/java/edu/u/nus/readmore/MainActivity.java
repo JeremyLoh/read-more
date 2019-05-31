@@ -12,9 +12,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private DrawerLayout drawer;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,8 +29,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setSupportActionBar(toolbar);
 
         drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        mAuth = FirebaseAuth.getInstance();
+        if (mAuth.getCurrentUser() == null) {
+            NavigationView logoutView = findViewById(R.id.nav_view);
+            logoutView.setVisibility(View.VISIBLE);
+            logoutView.setNavigationItemSelectedListener(this);
+            NavigationView loginView = findViewById(R.id.nav_view_login);
+            loginView.setVisibility(View.GONE);
+        } else {
+            NavigationView loginView = findViewById(R.id.nav_view_login);
+            loginView.setVisibility(View.VISIBLE);
+            loginView.setNavigationItemSelectedListener(this);
+            NavigationView logoutView = findViewById(R.id.nav_view);
+            logoutView.setVisibility(View.GONE);
+        }
 
 //      A method for the hamburger icon together with animations
 //      Can be created separately but would not have rotating animations
@@ -85,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            MainActivity.super.onBackPressed();
+                            finish();
                         }
                     })
                     .setNegativeButton("No", null)

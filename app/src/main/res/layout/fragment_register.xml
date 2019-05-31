@@ -15,7 +15,8 @@
             android:id="@+id/register_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="User ID" />
+            android:hint="Email"
+            android:inputType="textEmailAddress" />
 
         <EditText
             android:id="@+id/register_pwd"
@@ -23,20 +24,13 @@
             android:layout_height="wrap_content"
             android:hint="Password"
             android:inputType="textPassword" />
+
         <EditText
             android:id="@+id/register_pwd_check"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Confirm Password"
             android:inputType="textPassword" />
-
-        <EditText
-            android:id="@+id/register_email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Email"
-            android:inputType="textEmailAddress" />
-
 
     </LinearLayout>
 
@@ -45,21 +39,22 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/linearLayout1"
         android:layout_centerHorizontal="true"
-        android:orientation="vertical"
-        android:layout_marginTop="20dp  ">
+        android:layout_marginTop="20dp  "
+        android:orientation="vertical">
 
         <Button
             android:id="@+id/register_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Create account" />
+
         <TextView
             android:id="@+id/already_member"
-            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
-            android:gravity="center_horizontal"
             android:layout_height="wrap_content"
-            android:text="Already a member? Login here"/>
+            android:layout_marginTop="20dp"
+            android:gravity="center_horizontal"
+            android:text="Already a member? Login here" />
     </LinearLayout>
 
 
