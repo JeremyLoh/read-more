@@ -6,7 +6,6 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-
     <LinearLayout
         android:id="@+id/linearLayout1"
         android:layout_width="match_parent"
@@ -17,14 +16,28 @@
             android:id="@+id/user_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="User ID" />
+            android:hint="Email" />
 
-        <EditText
-            android:id="@+id/user_pwd"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Password"
-            android:inputType="textPassword" />
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/user_pwd"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:hint="Password"
+                android:inputType="textPassword" />
+
+            <ImageButton
+                android:id="@+id/toggle_password_btn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/ic_show_password_24dp" />
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -55,8 +68,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/linearLayout2"
-        android:orientation="horizontal"
-        android:layout_marginTop="80dp">
+        android:layout_marginTop="80dp"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/signup_btn"
@@ -65,18 +78,11 @@
             android:layout_weight="1"
             android:text="Sign-up" />
 
-        <!--<Button-->
-            <!--android:id="@+id/google_btn"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="0.5"-->
-            <!--android:text="login with google" />-->
-
         <com.google.android.gms.common.SignInButton
-            android:layout_weight="1"
             android:id="@+id/google_btn"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_width="wrap_content"/>
+            android:layout_weight="1" />
 
     </LinearLayout>
 

@@ -1,16 +1,22 @@
 package edu.u.nus.readmore;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -22,9 +28,14 @@ import com.google.android.gms.tasks.Task;
 
 
 public class LoginFragment extends Fragment {
-    TextView forgotPW;
-    Button signUpBtn,loginBtn;
-    SignInButton googleBtn;
+    private EditText userID, userPassword;
+    private TextView forgotPW;
+    private ImageButton passwordVisibilityBtn;
+    private Button signUpBtn,loginBtn;
+    private SignInButton googleBtn;
+
+    // flag for changing passwordVisibility, starts with false
+    private boolean passwordFlag = false;
 
     // RC_SIGN_IN is the request code you will assign for starting the new activity.
     // this can be any number. When the user is done with the subsequent activity and returns,
@@ -38,12 +49,13 @@ public class LoginFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         getActivity().setTitle("Login");
+        userID = getActivity().findViewById(R.id.user_id);
+        userPassword = getActivity().findViewById(R.id.user_pwd);
         forgotPW = getActivity().findViewById(R.id.tv_forgot_pwd);
+        passwordVisibilityBtn = getActivity().findViewById(R.id.toggle_password_btn);
         signUpBtn = getActivity().findViewById(R.id.signup_btn);
         loginBtn = getActivity().findViewById(R.id.login_btn);
         googleBtn = getActivity().findViewById(R.id.google_btn);
-
-
 
         //setting login button activity
 
@@ -69,6 +81,28 @@ public class LoginFragment extends Fragment {
                         .beginTransaction();
                 toRegFt.replace(R.id.intermediate_frame_layout, new ResetPasswordFragment());
                 toRegFt.commit();            }
+        });
+
+        // setup of passwordVisibility button
+        passwordVisibilityBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (passwordFlag) {
+                    // set to hide password
+                    passwordFlag = false;
+                    passwordVisibilityBtn.setImageResource(R.drawable.ic_hide_password_24dp);
+                    // set input type to textPassword
+                    userPassword.setInputType(InputType.TYPE_CLASS_TEXT |
+                            InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                } else {
+                    // set to show password
+                    passwordFlag = true;
+                    passwordVisibilityBtn.setImageResource(R.drawable.ic_show_password_24dp);
+                    // set input type to textVisiblePassword
+                    userPassword.setInputType(InputType.TYPE_CLASS_TEXT |
+                            InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                }
+            }
         });
 
         //setting google-link button
