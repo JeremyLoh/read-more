@@ -24,7 +24,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginFragment extends Fragment {
@@ -129,31 +131,57 @@ public class LoginFragment extends Fragment {
     }
 
     // Method for logging in Users
-    private void loginUser() {
+    private boolean verifyLoginInput(String ID, String Password) {
         String emailRegex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
-        String ID, Password;
-        ID = userID.getText().toString();
-        Password = userPassword.getText().toString();
+        Boolean checker = true;
 
         if (TextUtils.isEmpty(ID) || !ID.matches(emailRegex)) {
             Toast.makeText(getActivity().getApplicationContext(),
                     "Please enter a valid Email",
                     Toast.LENGTH_SHORT)
                     .show();
+            checker = false;
         }
-
         if (TextUtils.isEmpty(Password)) {
             Toast.makeText(getActivity().getApplicationContext(),
                     "Please enter a Password",
                     Toast.LENGTH_SHORT)
                     .show();
+            checker = false;
+        }
+        return checker;
+    }
+
+    private void loginUser() {
+        String ID, Password;
+        ID = userID.getText().toString();
+        Password = userPassword.getText().toString();
+
+        if (verifyLoginInput(ID, Password)) {
+            mAuth.signInWithEmailAndPassword(ID, Password)
+                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(getActivity().getApplicationContext(),
+                                        "Login Successful!",
+                                        Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(getActivity().getApplicationContext(),
+                                        MainActivity.class);
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(getActivity().getApplicationContext(),
+                                        "Login unsuccessful, please try again",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
         }
     }
 
     @Override
     public void onStart() {
         super.onStart();
-
     }
 
     // Google Account Sign-in
