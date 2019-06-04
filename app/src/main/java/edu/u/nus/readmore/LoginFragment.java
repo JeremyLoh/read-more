@@ -36,7 +36,7 @@ public class LoginFragment extends Fragment {
     private Button signUpBtn,loginBtn;
     private SignInButton googleBtn;
 
-    // flag for changing passwordVisibility, starts with false
+    // flag for changing passwordVisibility
     private boolean passwordFlag = false;
 
     // RC_SIGN_IN is the request code you will assign for starting the new activity.
