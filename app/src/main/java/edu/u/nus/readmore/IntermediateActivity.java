@@ -3,8 +3,18 @@ package edu.u.nus.readmore;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
 
 public class IntermediateActivity extends AppCompatActivity {
+    private Menu menu;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Initialize logout_menu xml file (android:visible="false" at start)
+        getMenuInflater().inflate(R.menu.logout_menu, menu);
+        menu = this.menu;
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +45,6 @@ public class IntermediateActivity extends AppCompatActivity {
                     .commit();
         }
     }
-
 
     @Override
     public boolean onSupportNavigateUp() {
