@@ -113,6 +113,9 @@ public class LoginFragment extends Fragment {
                     userPassword.setInputType(InputType.TYPE_CLASS_TEXT |
                             InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
                 }
+                // set cursor at end of EditText
+                userID.setSelection(userID.getText().length());
+                userPassword.setSelection(userPassword.getText().length());
             }
         });
 
