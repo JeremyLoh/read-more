@@ -161,18 +161,4 @@ public class RegisterFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_register, container, false);
     }
-
-// try to find ways to make back button go back to login fragment instead of home page
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        if (item.getItemId() == android.R.id.home) {
-//            FragmentTransaction regFT = getActivity()
-//                    .getSupportFragmentManager()
-//                    .beginTransaction();
-//            regFT.replace(R.id.intermediate_frame_layout, new LoginFragment());
-//            regFT.commit();
-//            return true;
-//        }
-//        return false;
-//    }
 }
