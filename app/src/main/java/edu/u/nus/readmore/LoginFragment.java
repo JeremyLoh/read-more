@@ -33,7 +33,7 @@ public class LoginFragment extends Fragment {
     private EditText userID, userPassword;
     private TextView forgotPW;
     private ImageButton passwordVisibilityBtn;
-    private Button signUpBtn,loginBtn;
+    private Button signUpBtn, loginBtn;
     private SignInButton googleBtn;
 
     // flag for changing passwordVisibility
@@ -70,7 +70,6 @@ public class LoginFragment extends Fragment {
             }
         });
 
-
         //setting sign-up button to RegisterFragment
         signUpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,7 +90,8 @@ public class LoginFragment extends Fragment {
                         .getSupportFragmentManager()
                         .beginTransaction();
                 toRegFt.replace(R.id.intermediate_frame_layout, new ResetPasswordFragment());
-                toRegFt.commit();            }
+                toRegFt.commit();
+            }
         });
 
         // setup of passwordVisibility button
@@ -182,11 +182,6 @@ public class LoginFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
     // Google Account Sign-in
     private void signIn() {
         // Configure sign-in to request the user's ID, email address, and basic
@@ -253,5 +248,6 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_login, container, false);
+
     }
 }

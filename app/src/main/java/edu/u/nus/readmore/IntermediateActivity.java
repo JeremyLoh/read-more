@@ -99,13 +99,13 @@ public class IntermediateActivity extends AppCompatActivity {
         };
 
         Intent currentIntent = this.getIntent();
-        if (currentIntent.hasExtra(getString(R.string.login_key))) {
+        if (currentIntent.hasExtra(getString(R.string.login_key)) && savedInstanceState == null) {
             // Loads LoginFragment
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.intermediate_frame_layout, new LoginFragment())
                     .commit();
-        } else if (currentIntent.hasExtra(getString(R.string.settings_key))) {
+        } else if (currentIntent.hasExtra(getString(R.string.settings_key)) && savedInstanceState == null) {
             // Set name of Action Bar
             getSupportActionBar().setTitle("Settings");
             // Loads SettingsFragment
