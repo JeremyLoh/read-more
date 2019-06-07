@@ -19,6 +19,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    private boolean TESTING_DB = true;
+
     private DrawerLayout drawer;
     private Menu optionsMenu;
     private MenuItem logoutItem;
@@ -76,6 +78,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (TESTING_DB) {
+            FetchData fd = new FetchData();
+            fd.execute();
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
