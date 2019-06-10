@@ -185,24 +185,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     List<String> listOfPageID = (List<String>) docContent.get("pageid");
                     int randomIndex = new Random().nextInt(listOfPageID.size());
                     pageid = listOfPageID.get(randomIndex);
-                    generateArticleContent(pageid);
+                    // Starts the FetchArticleData asyncTask
+                    (new FetchArticleData()).execute(pageid);
+
                 } else {
                     getNewArticle();
                 }
             }
         });
         return new Article(articleContent.get("title"),
-                            articleContent.get("description"),
-                            pageid,
-                            articleContent.get("URL"),
-                            articleContent.get("imageURL"));
-    }
-
-    private Map<String, String> generateArticleContent(String pageID) {
-        (new FetchArticleData()).execute(pageID);
-
-        return articleContent;
-
+                articleContent.get("description"),
+                pageid,
+                articleContent.get("URL"),
+                articleContent.get("imageURL"));
     }
 
     private String randomTopicGenerator() {
