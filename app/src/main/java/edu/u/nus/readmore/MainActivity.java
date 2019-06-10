@@ -13,28 +13,46 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.util.Util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.HashMap;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
+        AsyncArticleResponse {
     private boolean TESTING_DB = false;
 
+    private Map<String, String> articleContent;
     private DrawerLayout drawer;
     private Menu optionsMenu;
     private MenuItem logoutItem;
     private boolean isLoggedIn;
-
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mFirebaseAuthStateListener;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private NavigationView navigationView;
     private final List<String> topicList = new ArrayList<>(Arrays.asList("Science"));
     private final int topicListIndex = topicList.size() - 1;
+    private TextView articleTextView;
+    private String currentPageid;
+    private FetchArticleData fetchArticleData = new FetchArticleData();
 
     // onCreateOptionsMenu is called once
     @Override
@@ -89,6 +107,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fd.execute();
         }
 
+        // Initialise article components
+        articleTextView = findViewById(R.id.articleContentTextView);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -126,6 +147,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+
+        getNewArticle();
     }
 
     /**
@@ -139,6 +162,61 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Intent startIntent = new Intent(getApplicationContext(), IntermediateActivity.class);
         startIntent.putExtra(key, value);
         startActivity(startIntent);
+    }
+
+    private Article getNewArticle() {
+        // Random generated number for retrieving article
+        String checker = Util.autoId();
+
+        // String storing the collection name of topic
+        String randomTopic = randomTopicGenerator();
+        CollectionReference topicRef = db.collection(randomTopic);
+        Query subTopic = topicRef.whereGreaterThan("ID", checker).limit(1);
+        if (subTopic == null) {
+            subTopic = topicRef.whereLessThanOrEqualTo("ID", checker).limit(1);
+        }
+        subTopic.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    List<DocumentSnapshot> documentList = task.getResult().getDocuments();
+                    if (documentList == null || documentList.size() == 0) {
+                        getNewArticle();
+                    }
+                    DocumentSnapshot document = documentList.get(0);
+                    Map<String, Object> docContent = document.getData();
+                    List<String> listOfPageID = (List<String>) docContent.get("pageid");
+                    int randomIndex = new Random().nextInt(listOfPageID.size());
+                    String pageid = listOfPageID.get(randomIndex);
+                    generateArticleContent(pageid);
+                } else {
+                    getNewArticle();
+                }
+            }
+        });
+        return new Article(articleContent.get("title"),
+                            articleContent.get("description"),
+                            currentPageid,
+                            articleContent.get("URL"),
+                            articleContent.get("imageURL"));
+    }
+
+    private void generateArticleContent(String pageid) {
+        this.currentPageid = pageid;
+        // set interface (AsyncArticleResponse) in FetchArticleData back to this class
+        fetchArticleData.articleResponse = this;
+        (new FetchArticleData()).execute(pageid);
+    }
+
+    private String randomTopicGenerator() {
+        //TODO
+        return "";
+    }
+
+    // For AsyncArticleResponse interface
+    @Override
+    public void processFinish(Map<String, String> output) {
+        articleContent = output;
     }
 
     @Override
