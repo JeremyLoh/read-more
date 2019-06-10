@@ -21,12 +21,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 public class RegisterFragment extends Fragment {
     private TextView alreadyMember;
     private Button createAccBtn;
     private EditText email, password, confirmPassword;
     private FirebaseAuth mAuth;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static final String TAG = "EmailPassword";
 
     @Override
@@ -103,7 +106,7 @@ public class RegisterFragment extends Fragment {
     private void registerNewUser() {
         if (validateForm()) {
             // Create a new user account
-            String givenEmail = email.getText().toString();
+            final String givenEmail = email.getText().toString();
             String givenPassword = password.getText().toString();
 
             mAuth.createUserWithEmailAndPassword(givenEmail, givenPassword)
@@ -122,6 +125,14 @@ public class RegisterFragment extends Fragment {
                                         "Welcome!",
                                         Toast.LENGTH_SHORT)
                                         .show();
+
+                                // add user to db
+                                String ID = user.getUid();
+                                User newUser = new User(ID);
+                                db.collection("Users")
+                                        .document(ID)
+                                        .set(newUser, SetOptions.merge());
+
                                 updateUI(user);
                             } else {
                                 // If sign in fails, display a message to the user.

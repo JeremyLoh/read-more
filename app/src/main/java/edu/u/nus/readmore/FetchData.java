@@ -8,6 +8,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.firestore.util.Util;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,6 +71,8 @@ class FetchData extends AsyncTask<Void, Void, Void> {
 
                 Map<String, Object> item = new HashMap<>();
                 item.put("pageid", pageidArr);
+                // generate random id
+                item.put("ID", Util.autoId());
 
                 db.collection("Science")
                         .document(topic)
