@@ -18,8 +18,12 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    private boolean TESTING_DB = true;
+    private boolean TESTING_DB = false;
 
     private DrawerLayout drawer;
     private Menu optionsMenu;
@@ -29,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mFirebaseAuthStateListener;
     private NavigationView navigationView;
+    private final List<String> topicList = new ArrayList<>(Arrays.asList("Science"));
+    private final int topicListIndex = topicList.size() - 1;
 
     // onCreateOptionsMenu is called once
     @Override
