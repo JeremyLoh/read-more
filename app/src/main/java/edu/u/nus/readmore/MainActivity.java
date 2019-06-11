@@ -48,8 +48,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseAuth.AuthStateListener mFirebaseAuthStateListener;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private NavigationView navigationView;
-    private final List<String> topicList = new ArrayList<>(Arrays.asList("Science"));
-    private final int topicListIndex = topicList.size() - 1;
     private TextView articleTextView;
     private String currentPageid;
     private FetchArticleData fetchArticleData = new FetchArticleData();

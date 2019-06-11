@@ -36,17 +36,14 @@ class FetchData extends AsyncTask<Void, Void, Void> {
         try {
             for (String topic : Science) {
                 String data = "";
-                StringBuilder urlStr = new StringBuilder("https://en.wikipedia.org/w/api.php?");
-                StringBuilder modifier = new StringBuilder();
-                modifier.append("action=query&format=json" +
+                String urlStr = "https://en.wikipedia.org/w/api.php?" +
+                        "action=query&format=json" +
                         "&list=categorymembers" +
                         "&cmlimit=max" +
                         "&cmtype=page" +
                         "&cmprop=ids" +
-                        "&cmtitle=Category:" + topic);
-                urlStr.append(modifier.toString());
-
-                URL url = new URL(urlStr.toString());
+                        "&cmtitle=Category:" + topic;
+                URL url = new URL(urlStr);
                 // create a connection for url
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
                 InputStream inputStream = httpURLConnection.getInputStream();
