@@ -54,14 +54,14 @@
                         android:id="@+id/articleTitleTextView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="ARTICLE TITLE" />
+                        android:text="" />
                     <!-- Text from Article -->
                     <TextView
                         android:id="@+id/articleContentTextView"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="3"
-                        android:text="ARTICLE TEXT" />
+                        android:text="" />
                 </LinearLayout>
             </android.support.v7.widget.CardView>
 
