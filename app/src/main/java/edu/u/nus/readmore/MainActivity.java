@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -158,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     savedInstanceState.getString("pageid"),
                     savedInstanceState.getString("URL"),
                     savedInstanceState.getString("imageURL"));
-            displayArticle();
+            displayArticle(currentArticle);
         }
     }
 
@@ -178,12 +179,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void getNewArticle() {
         // Random generated number for retrieving article
         String checker = Util.autoId();
-
         // String storing the collection name of topic
         String randomTopic = randomTopicGenerator();
         CollectionReference topicRef = db.collection(randomTopic);
-        Query subTopic = topicRef.whereGreaterThan("ID", checker).limit(1);
-        if (subTopic == null) {
+        Query subTopic;
+        if (new Random().nextInt(2) == 1) {
+            subTopic = topicRef.whereGreaterThan("ID", checker).limit(1);
+        } else {
             subTopic = topicRef.whereLessThanOrEqualTo("ID", checker).limit(1);
         }
         subTopic.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -219,9 +221,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return listOfTopics.get(randomIndex);
     }
 
-    private void displayArticle() {
-        articleTitleTextView.setText(currentArticle.getTitle());
-        articleContentTextView.setText(currentArticle.getDescription());
+    private void displayArticle(Article article) {
+        articleTitleTextView.setText(article.getTitle());
+        articleContentTextView.setText(article.getDescription());
     }
 
     // For AsyncArticleResponse interface, to setup new articles obtained from getNewArticle()
@@ -232,7 +234,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 output.get("pageid"),
                 output.get("URL"),
                 output.get("imageURL"));
-        displayArticle();
+        displayArticle(currentArticle);
+
     }
 
     @Override
