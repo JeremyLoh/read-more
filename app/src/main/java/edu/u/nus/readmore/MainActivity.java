@@ -11,9 +11,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,19 +22,17 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.util.Util;
 
-import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         AsyncArticleResponse {
@@ -48,8 +46,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseAuth.AuthStateListener mFirebaseAuthStateListener;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private NavigationView navigationView;
-    private TextView articleTextView;
-//    private String currentPageid;
+    private TextView articleContentTextView, articleTitleTextView;
+    private ImageView articleImageView;
+    private Article currentArticle = null;
+    private final List<String> listOfTopics = Arrays.asList("Science");
 
     // onCreateOptionsMenu is called once
     @Override
@@ -99,17 +99,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
         if (TESTING_DB) {
             FetchData fd = new FetchData();
             fd.execute();
         }
 
         // Initialise article components
-        articleTextView = findViewById(R.id.articleContentTextView);
-
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
+        articleTitleTextView = findViewById(R.id.articleTitleTextView);
+        articleContentTextView = findViewById(R.id.articleContentTextView);
+        articleImageView = findViewById(R.id.articleImageView);
         // Initialise Firebase components
         mFirebaseAuth = FirebaseAuth.getInstance();
         // Checking user status for displaying different menu options
@@ -144,6 +145,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+
+        // Checking current display have any article,
+        // if article present display back same article,
+        // else generate new article for user to view
+        // help to prevent generating new article if user change view Orientation
+        if (savedInstanceState == null) {
+            getNewArticle();
+        } else {
+            currentArticle = new Article(savedInstanceState.getString("title"),
+                    savedInstanceState.getString("description"),
+                    savedInstanceState.getString("pageid"),
+                    savedInstanceState.getString("URL"),
+                    savedInstanceState.getString("imageURL"));
+            displayArticle();
+        }
     }
 
     /**
@@ -199,17 +215,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private String randomTopicGenerator() {
         //TODO
-        return "Science";
+        int randomIndex = new Random().nextInt(listOfTopics.size());
+        return listOfTopics.get(randomIndex);
+    }
+
+    private void displayArticle() {
+        articleTitleTextView.setText(currentArticle.getTitle());
+        articleContentTextView.setText(currentArticle.getDescription());
     }
 
     // For AsyncArticleResponse interface, to setup new articles obtained from getNewArticle()
     @Override
     public void processFinish(Map<String, String> output) {
-        Article currentArticle = new Article(output.get("title"),
+        currentArticle = new Article(output.get("title"),
                 output.get("description"),
                 output.get("pageid"),
                 output.get("URL"),
                 output.get("imageURL"));
+        displayArticle();
     }
 
     @Override
@@ -247,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mFirebaseAuthStateListener);
-        getNewArticle();
+
     }
 
     @Override
@@ -278,5 +301,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .setNegativeButton("No", null)
                     .show();
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // storing article content into outState which retrieve back in onCreate
+        outState.putString("title", currentArticle.getTitle());
+        outState.putString("description", currentArticle.getDescription());
+        outState.putString("pageid", currentArticle.getPageid());
+        outState.putString("URL", currentArticle.getURL());
+        outState.putString("imageURL", currentArticle.getImageURL());
     }
 }
