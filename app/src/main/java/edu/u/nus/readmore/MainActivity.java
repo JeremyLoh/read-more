@@ -2,6 +2,8 @@ package edu.u.nus.readmore;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.Image;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -224,6 +227,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void displayArticle(Article article) {
         articleTitleTextView.setText(article.getTitle());
         articleContentTextView.setText(article.getDescription());
+        new DownloadImageTask((ImageView) findViewById(R.id.articleImageView)).
+                execute(article.getImageURL());
+        browserDirectView(articleImageView, article.getURL());
+    }
+
+    private void browserDirectView(View view, final String URL) {
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent viewIntent =
+                        new Intent("android.intent.action.VIEW",
+                                Uri.parse(URL));
+                viewIntent.addCategory(Intent.CATEGORY_BROWSABLE);
+                startActivity(viewIntent);
+            }
+        });
     }
 
     // For AsyncArticleResponse interface, to setup new articles obtained from getNewArticle()
