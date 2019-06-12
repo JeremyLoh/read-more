@@ -21,9 +21,15 @@ public class FetchArticleData extends AsyncTask<String, Void, Map<String, String
     AsyncArticleResponse articleResponse = null;
     private Map<String, String> output = new HashMap<>();
 
+    public FetchArticleData(AsyncArticleResponse asyncArticleResponse) {
+        this.articleResponse = asyncArticleResponse;
+    }
+
     @Override
     protected Map<String, String> doInBackground(String... pageID) {
         try {
+            String pageid = pageID[0];
+            output.put("pageid", pageid);
             // Obtain largest possible image from query
             // Query with valid thumbnail image (Example)
             // https://en.wikipedia.org/w/api.php?action=query&format=json&pageids=23420193&prop=pageimages|images&pithumbsize=1000
@@ -32,14 +38,14 @@ public class FetchArticleData extends AsyncTask<String, Void, Map<String, String
             String imageQuery = "https://en.wikipedia.org/w/api.php?" +
                     "action=query&format=json" +
                     "&pageids=" +
-                    pageID[0] +
+                    pageid +
                     "&prop=pageimages|images" +
                     "&pithumbsize=1000"; // set max image size obtained to be within 1000px
             String imageData = queryURL(new URL(imageQuery));
             // parse data obtained
             JSONObject queryObject = (new JSONObject(imageData)).getJSONObject("query");
             JSONObject pagesObject = queryObject.getJSONObject("pages");
-            JSONObject pageIDObject = pagesObject.getJSONObject(pageID[0]);
+            JSONObject pageIDObject = pagesObject.getJSONObject(pageid);
             // check for existing thumbnail JSON object (from pageimages query)
             if (pageIDObject.has("thumbnail")) {
                 JSONObject imageInfo = pageIDObject.getJSONObject("thumbnail");
@@ -66,7 +72,13 @@ public class FetchArticleData extends AsyncTask<String, Void, Map<String, String
                                 "&prop=pageimages" +
                                 "&pithumbsize=1000" +
                                 "&titles=Image:" + imageTitle;
-                        String imageSrc = queryURL(new URL(imageTitleQuery));
+                        JSONObject imageJSON = new JSONObject(queryURL(new URL(imageTitleQuery)));
+                        // Retrieving image link through obtained JSON (imageJSON)
+                        JSONObject imageQueryObj = imageJSON.getJSONObject("query");
+                        JSONObject imagePagesObj = imageQueryObj.getJSONObject("pages");
+                        JSONObject pagesInfoObj = imagePagesObj.getJSONObject("-1");
+                        JSONObject thumbnailObj = pagesInfoObj.getJSONObject("thumbnail");
+                        String imageSrc = thumbnailObj.getString("source");
                         output.put("imageURL", imageSrc);
                     } else {
                         // No image available
@@ -81,7 +93,7 @@ public class FetchArticleData extends AsyncTask<String, Void, Map<String, String
             // fetch article query
             String articleQuery = "https://en.wikipedia.org/w/api.php?" +
                     "action=query&format=json" +
-                    "&pageids=" + pageID[0] +
+                    "&pageids=" + pageid +
                     "&prop=info|extracts" +
                     "&inprop=url" +
                     "&explaintext" +
@@ -90,7 +102,7 @@ public class FetchArticleData extends AsyncTask<String, Void, Map<String, String
             // Parse data obtained
             JSONObject queryObj = (new JSONObject(data)).getJSONObject("query");
             JSONObject pagesObj = queryObj.getJSONObject("pages");
-            JSONObject pageIDObj = pagesObj.getJSONObject(pageID[0]);
+            JSONObject pageIDObj = pagesObj.getJSONObject(pageid);
             String title = pageIDObj.getString("title");
             String fullURL = pageIDObj.getString("fullurl");
             String extract = pageIDObj.getString("extract");

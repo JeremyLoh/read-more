@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -39,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         AsyncArticleResponse {
     private boolean TESTING_DB = false;
 
-    private Map<String, String> articleContent;
     private DrawerLayout drawer;
     private Menu optionsMenu;
     private MenuItem logoutItem;
@@ -49,8 +49,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private NavigationView navigationView;
     private TextView articleTextView;
-    private String currentPageid;
-    private FetchArticleData fetchArticleData = new FetchArticleData();
+//    private String currentPageid;
 
     // onCreateOptionsMenu is called once
     @Override
@@ -145,8 +144,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-        getNewArticle();
     }
 
     /**
@@ -162,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         startActivity(startIntent);
     }
 
-    private Article getNewArticle() {
+    private void getNewArticle() {
         // Random generated number for retrieving article
         String checker = Util.autoId();
 
@@ -180,41 +177,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     List<DocumentSnapshot> documentList = task.getResult().getDocuments();
                     if (documentList == null || documentList.size() == 0) {
                         getNewArticle();
+                    } else {
+                        DocumentSnapshot document = documentList.get(0);
+                        Map<String, Object> docContent = document.getData();
+                        List<String> listOfPageID = (List<String>) (docContent.get("pageid"));
+                        int randomIndex = new Random().nextInt(listOfPageID.size());
+                        String pageid = listOfPageID.get(randomIndex);
+                        generateArticleContent(pageid);
                     }
-                    DocumentSnapshot document = documentList.get(0);
-                    Map<String, Object> docContent = document.getData();
-                    List<String> listOfPageID = (List<String>) docContent.get("pageid");
-                    int randomIndex = new Random().nextInt(listOfPageID.size());
-                    String pageid = listOfPageID.get(randomIndex);
-                    generateArticleContent(pageid);
                 } else {
                     getNewArticle();
                 }
             }
         });
-        return new Article(articleContent.get("title"),
-                            articleContent.get("description"),
-                            currentPageid,
-                            articleContent.get("URL"),
-                            articleContent.get("imageURL"));
     }
 
     private void generateArticleContent(String pageid) {
-        this.currentPageid = pageid;
         // set interface (AsyncArticleResponse) in FetchArticleData back to this class
-        fetchArticleData.articleResponse = this;
-        (new FetchArticleData()).execute(pageid);
+        (new FetchArticleData(this)).execute(pageid);
     }
 
     private String randomTopicGenerator() {
         //TODO
-        return "";
+        return "Science";
     }
 
-    // For AsyncArticleResponse interface
+    // For AsyncArticleResponse interface, to setup new articles obtained from getNewArticle()
     @Override
     public void processFinish(Map<String, String> output) {
-        articleContent = output;
+        Article currentArticle = new Article(output.get("title"),
+                output.get("description"),
+                output.get("pageid"),
+                output.get("URL"),
+                output.get("imageURL"));
     }
 
     @Override
@@ -252,6 +247,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mFirebaseAuthStateListener);
+        getNewArticle();
     }
 
     @Override
