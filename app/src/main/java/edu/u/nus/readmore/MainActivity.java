@@ -15,19 +15,24 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.util.Util;
 
 
@@ -50,7 +55,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView navigationView;
     private TextView articleContentTextView, articleTitleTextView;
     private ImageView articleImageView;
+    private Button previousArticleBtn, nextArticleBtn;
     private Article currentArticle = null;
+    private ScrollView articleScrollView;
     private final List<String> listOfTopics = Arrays.asList("Science");
 
     // onCreateOptionsMenu is called once
@@ -109,10 +116,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fd.execute();
         }
 
-        // Initialise article components
-        articleTitleTextView = findViewById(R.id.articleTitleTextView);
-        articleContentTextView = findViewById(R.id.articleContentTextView);
-        articleImageView = findViewById(R.id.articleImageView);
         // Initialise Firebase components
         mFirebaseAuth = FirebaseAuth.getInstance();
         // Checking user status for displaying different menu options
@@ -137,6 +140,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         };
 
+        // Initialise article components
+        articleTitleTextView = findViewById(R.id.articleTitleTextView);
+        articleContentTextView = findViewById(R.id.articleContentTextView);
+        articleImageView = findViewById(R.id.articleImageView);
+        previousArticleBtn = findViewById(R.id.previousArticleBtn);
+        nextArticleBtn = findViewById(R.id.nextArticleBtn);
+        articleScrollView = findViewById(R.id.articleScrollView);
+
+        // Add onClickListeners for article buttons
+        nextArticleBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // check if user is logged in
+                FirebaseUser firebaseUser = mFirebaseAuth.getCurrentUser();
+                if (firebaseUser != null) {
+                    // Logged in, Save current article to user readList in database
+                    String userID = firebaseUser.getUid();
+                    addToReadList(userID, currentArticle);
+                    // Get new article
+                    getNewArticle();
+                } else {
+                    // Guest mode, random article generated, displayed
+                    getNewArticle();
+                }
+            }
+        });
+
         // Navigation drawer bar set-up
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -153,7 +183,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // else generate new article for user to view
         // help to prevent generating new article if user change view Orientation
         if (savedInstanceState == null) {
-            getNewArticle();
+            // Check if user is logged in
+            FirebaseUser firebaseUser = mFirebaseAuth.getCurrentUser();
+            if (firebaseUser != null) {
+                // Get user object
+                final String userID = firebaseUser.getUid();
+                DocumentReference userDoc = db.collection("Users").document(userID);
+                userDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        User user = documentSnapshot.toObject(User.class);
+                        // Check read list for most recent Article
+                        if (user != null) {
+                            Article latestArticle = getLatestArticle(user);
+                            if (latestArticle == null) {
+                                getNewArticle();
+                            } else {
+                                displayArticle(latestArticle);
+                            }
+                        } else {
+                            getNewArticle();
+                        }
+                    }
+                });
+            } else {
+                // Guest mode, random article generated, displayed
+                getNewArticle();
+            }
         } else {
             currentArticle = new Article(savedInstanceState.getString("title"),
                     savedInstanceState.getString("description"),
@@ -162,6 +218,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     savedInstanceState.getString("imageURL"));
             displayArticle(currentArticle);
         }
+    }
+
+    private Article getLatestArticle(User user) {
+        List<Article> readList = user.getReadList();
+        int readListSize = readList.size();
+        if (readListSize == 0) {
+            return null;
+        } else {
+            return readList.get(readListSize - 1);
+        }
+    }
+
+    private void addToReadList(final String userID, final Article article) {
+        DocumentReference userDoc = db.collection("Users").document(userID);
+        userDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                User user = documentSnapshot.toObject(User.class);
+                if (user != null) {
+                    // Add Article to read list
+                    if (article != null) {
+                        user.addReadArticle(article);
+                    }
+                    // Update database
+                    db.collection("Users")
+                            .document(userID)
+                            .set(user, SetOptions.merge());
+                }
+            }
+        });
     }
 
     /**
@@ -177,6 +263,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         startActivity(startIntent);
     }
 
+    /**
+     * Generates a new Article (from Wikipedia API), based on a randomTopic and random pageid.
+     */
     private void getNewArticle() {
         // Random generated number for retrieving article
         String checker = Util.autoId();
@@ -211,23 +300,43 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    private void generateArticleContent(String pageid) {
-        // set interface (AsyncArticleResponse) in FetchArticleData back to this class
-        (new FetchArticleData(this)).execute(pageid);
-    }
-
     private String randomTopicGenerator() {
         //TODO
         int randomIndex = new Random().nextInt(listOfTopics.size());
         return listOfTopics.get(randomIndex);
     }
 
+    private void generateArticleContent(String pageid) {
+        // set interface (AsyncArticleResponse) in FetchArticleData back to this class
+        // executes AsyncTask, runs AsyncArticleResponse interface function at the end
+        (new FetchArticleData(this)).execute(pageid);
+    }
+
+    // For AsyncArticleResponse interface, to setup new articles obtained from getNewArticle()
+    @Override
+    public void processFinish(Map<String, String> output) {
+        currentArticle = new Article(output.get("title"),
+                output.get("description"),
+                output.get("pageid"),
+                output.get("URL"),
+                output.get("imageURL"));
+        displayArticle(currentArticle);
+        // Scroll to top
+        articleScrollView.smoothScrollTo(0, 0);
+    }
+
     private void displayArticle(Article article) {
         articleTitleTextView.setText(article.getTitle());
         articleContentTextView.setText(article.getDescription());
-        new DownloadImageTask((ImageView) findViewById(R.id.articleImageView)).
-                execute(article.getImageURL());
-        browserDirectView(articleImageView, article.getURL());
+        String imageURL = article.getImageURL();
+        if (imageURL.equals("")) {
+            // Display default image
+        } else {
+            // Retrieve image and set to article ImageView
+            new DownloadImageTask((ImageView) findViewById(R.id.articleImageView)).
+                    execute(article.getImageURL());
+            browserDirectView(articleImageView, article.getURL());
+        }
     }
 
     private void browserDirectView(View view, final String URL) {
@@ -241,18 +350,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(viewIntent);
             }
         });
-    }
-
-    // For AsyncArticleResponse interface, to setup new articles obtained from getNewArticle()
-    @Override
-    public void processFinish(Map<String, String> output) {
-        currentArticle = new Article(output.get("title"),
-                output.get("description"),
-                output.get("pageid"),
-                output.get("URL"),
-                output.get("imageURL"));
-        displayArticle(currentArticle);
-
     }
 
     @Override

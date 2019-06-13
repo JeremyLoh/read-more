@@ -25,6 +25,7 @@
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
         <ScrollView
+            android:id="@+id/articleScrollView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -53,6 +54,9 @@
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="1"
+                            android:paddingTop="16dp"
+                            android:adjustViewBounds="true"
+                            android:maxHeight="300dp"
                             android:clickable="true"
                             android:scaleType="centerCrop"
                             android:src="@drawable/ic_launcher_background" />
@@ -100,8 +104,10 @@
                         android:layout_marginStart="16sp"
                         android:layout_weight="1"
                         android:drawableStart="@drawable/ic_arrow_upward_black_24dp"
+                        android:fontFamily="sans-serif-black"
                         android:padding="16sp"
-                        android:text="@string/previous_article_text" />
+                        android:text="@string/previous_article_text"
+                        android:textStyle="bold" />
 
                     <Button
                         android:id="@+id/nextArticleBtn"
@@ -110,8 +116,10 @@
                         android:layout_marginEnd="16sp"
                         android:layout_weight="1"
                         android:drawableEnd="@drawable/ic_arrow_downward_black_24dp"
+                        android:fontFamily="sans-serif-black"
                         android:padding="16sp"
-                        android:text="@string/next_article_text" />
+                        android:text="@string/next_article_text"
+                        android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
