@@ -34,6 +34,7 @@ class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     @Override
     protected void onPostExecute(Bitmap bitmap) {
         imageView.setImageBitmap(bitmap);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         super.onPostExecute(bitmap);
     }
 }
