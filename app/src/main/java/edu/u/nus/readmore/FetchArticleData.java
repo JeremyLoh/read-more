@@ -106,6 +106,10 @@ public class FetchArticleData extends AsyncTask<String, Void, Map<String, String
             String title = pageIDObj.getString("title");
             String fullURL = pageIDObj.getString("fullurl");
             String extract = pageIDObj.getString("extract");
+            // Add additional newlines in extract, (after each sentence)
+            // remove whitespace at start and end
+            extract = extract.replace(".\n", ".");
+            extract = (extract.replace(". ", ".\n\n")).trim();
             output.put("title", title);
             output.put("URL", fullURL);
             output.put("description", extract);
