@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<font-family xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!--
+    fontWeight: Ranges from 100 to 900, increments of 100
+        400 (Regular), 700 (Bold)
+     -->
+    <font
+        app:fontStyle="normal"
+        app:fontWeight="400"
+        app:font="@font/libre_baskerville_regular" />
+    <font
+        app:fontStyle="italic"
+        app:fontWeight="400"
+        app:font="@font/libre_baskerville_italic" />
+    <font
+        app:fontStyle="normal"
+        app:fontWeight="700"
+        app:font="@font/libre_baskerville_bold" />
+</font-family>
