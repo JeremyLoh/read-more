@@ -24,75 +24,96 @@
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-            <!-- Card View for Article -->
-            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/articleCardView"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                card_view:cardCornerRadius="4dp">
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
 
-                <LinearLayout
-                    android:id="@+id/articleLinearLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-                    <!-- Image -->
-                    <ImageView
-                        android:id="@+id/articleImageView"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="2"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/ic_launcher_background" />
-                    <!-- Title of Article -->
-                    <TextView
-                        android:id="@+id/articleTitleTextView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="" />
-                    <!-- Text from Article -->
-                    <TextView
-                        android:id="@+id/articleContentTextView"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="3"
-                        android:text="" />
-                </LinearLayout>
-            </android.support.v7.widget.CardView>
-
-            <!-- Previous/Next Article buttons -->
             <LinearLayout
-                android:id="@+id/changeArticleLinearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/previousArticleBtn"
-                    android:layout_width="0dp"
+                android:orientation="vertical">
+                <!-- Card View for Article -->
+                <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/articleCardView"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="16sp"
-                    android:layout_weight="1"
-                    android:drawableStart="@drawable/ic_arrow_upward_black_24dp"
-                    android:padding="16sp"
-                    android:text="@string/previous_article_text" />
+                    android:layout_margin="8dp"
+                    card_view:cardCornerRadius="4dp">
 
-                <Button
-                    android:id="@+id/nextArticleBtn"
-                    android:layout_width="0dp"
+                    <LinearLayout
+                        android:id="@+id/articleLinearLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+                        <!-- Image -->
+                        <ImageView
+                            android:id="@+id/articleImageView"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/ic_launcher_background" />
+                        <!-- Title of Article -->
+                        <TextView
+                            android:id="@+id/articleTitleTextView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/nixie_one_regular"
+                            android:paddingStart="16dp"
+                            android:paddingTop="16dp"
+                            android:paddingEnd="16dp"
+                            android:paddingBottom="8dp"
+                            android:text=""
+                            android:textSize="34sp"
+                            android:textStyle="italic|bold" />
+                        <!-- Text from Article -->
+                        <TextView
+                            android:id="@+id/articleContentTextView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/libre_baskerville_regular"
+                            android:lineSpacingExtra="8sp"
+                            android:paddingStart="16dp"
+                            android:paddingTop="8dp"
+                            android:paddingEnd="16dp"
+                            android:paddingBottom="16dp"
+                            android:text=""
+                            android:textSize="16sp"
+                            android:textStyle="normal" />
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
+
+                <!-- Previous/Next Article buttons -->
+                <LinearLayout
+                    android:id="@+id/changeArticleLinearLayout"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="16sp"
-                    android:layout_weight="1"
-                    android:drawableEnd="@drawable/ic_arrow_downward_black_24dp"
-                    android:padding="16sp"
-                    android:text="@string/next_article_text" />
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/previousArticleBtn"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16sp"
+                        android:layout_weight="1"
+                        android:drawableStart="@drawable/ic_arrow_upward_black_24dp"
+                        android:padding="16sp"
+                        android:text="@string/previous_article_text" />
+
+                    <Button
+                        android:id="@+id/nextArticleBtn"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16sp"
+                        android:layout_weight="1"
+                        android:drawableEnd="@drawable/ic_arrow_downward_black_24dp"
+                        android:padding="16sp"
+                        android:text="@string/next_article_text" />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
+        </ScrollView>
 
     </LinearLayout>
 
@@ -104,6 +125,5 @@
         android:layout_gravity="start"
         android:visibility="visible"
         app:menu="@menu/drawer_menu_login" />
-
 
 </android.support.v4.widget.DrawerLayout>
