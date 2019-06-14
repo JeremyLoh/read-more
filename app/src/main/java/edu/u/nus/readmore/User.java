@@ -5,8 +5,8 @@ import java.util.List;
 
 class User {
     private String ID;
-    // readList has a maximum size of 100
-    private final int READLIST_LIMIT = 100;
+    // readList has a maximum size of 1000
+    private final int READLIST_LIMIT = 1000;
     private List<Article> readList;
 
     public User() {

@@ -239,7 +239,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (user != null) {
                     // Add Article to read list
                     if (article != null) {
-                        user.addReadArticle(article);
+                        if (!user.hasReadArticle(article)) {
+                            user.addReadArticle(article);
+                        }
                     }
                     // Update database
                     db.collection("Users")

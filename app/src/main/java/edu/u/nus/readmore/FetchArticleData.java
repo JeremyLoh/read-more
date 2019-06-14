@@ -60,27 +60,41 @@ public class FetchArticleData extends AsyncTask<String, Void, Map<String, String
                     JSONArray imageArray = pageIDObject.getJSONArray("images");
                     int imageArraySize = imageArray.length();
                     if (imageArraySize >= 1) {
-                        // Get a random image
-                        int index = (new Random()).nextInt(imageArraySize);
-                        JSONObject imageInfo = imageArray.getJSONObject(index);
-                        String imageTitle = imageInfo.getString("title");
-                        // Query in format: https://en.wikipedia.org/w/api.php?
-                        // action=query&format=json&prop=pageimages&pithumbsize=1000
-                        // &titles=Image:[IMAGE_FILE_TITLE]
-                        // Query image size max of 1000 (&pithumbsize=1000)
-                        String imageTitleQuery = "https://en.wikipedia.org/w/api.php?" +
-                                "action=query&format=json" +
-                                "&prop=pageimages" +
-                                "&pithumbsize=1000" +
-                                "&titles=Image:" + imageTitle;
-                        JSONObject imageJSON = new JSONObject(queryURL(new URL(imageTitleQuery)));
-                        // Retrieving image link through obtained JSON (imageJSON)
-                        JSONObject imageQueryObj = imageJSON.getJSONObject("query");
-                        JSONObject imagePagesObj = imageQueryObj.getJSONObject("pages");
-                        JSONObject pagesInfoObj = imagePagesObj.getJSONObject("-1");
-                        JSONObject thumbnailObj = pagesInfoObj.getJSONObject("thumbnail");
-                        String imageSrc = thumbnailObj.getString("source");
-                        output.put("imageURL", imageSrc);
+                        // Obtain first image that has a valid extension (not svg)
+                        String imageTitle = "";
+                        boolean foundValidImage = false;
+                        for (int index = 0; index < imageArraySize; index++) {
+                            JSONObject imageInfo = imageArray.getJSONObject(index);
+                            imageTitle = imageInfo.getString("title");
+                            // check image extension
+                            String imageExtension = imageTitle.substring(imageTitle.length() - 3);
+                            if (imageExtension.equals("jpg") || imageExtension.equals("png")) {
+                                foundValidImage = true;
+                                break;
+                            }
+                        }
+                        if (foundValidImage) {
+                            // Query in format: https://en.wikipedia.org/w/api.php?
+                            // action=query&format=json&prop=pageimages&pithumbsize=1000
+                            // &titles=Image:[IMAGE_FILE_TITLE]
+                            // Query image size max of 1000 (&pithumbsize=1000)
+                            String imageTitleQuery = "https://en.wikipedia.org/w/api.php?" +
+                                    "action=query&format=json" +
+                                    "&prop=pageimages" +
+                                    "&pithumbsize=1000" +
+                                    "&titles=Image:" + imageTitle;
+                            JSONObject imageJSON = new JSONObject(queryURL(new URL(imageTitleQuery)));
+                            // Retrieving image link through obtained JSON (imageJSON)
+                            JSONObject imageQueryObj = imageJSON.getJSONObject("query");
+                            JSONObject imagePagesObj = imageQueryObj.getJSONObject("pages");
+                            JSONObject pagesInfoObj = imagePagesObj.getJSONObject("-1");
+                            JSONObject thumbnailObj = pagesInfoObj.getJSONObject("thumbnail");
+                            String imageSrc = thumbnailObj.getString("source");
+                            output.put("imageURL", imageSrc);
+                        } else {
+                            // No image available
+                            output.put("imageURL", "");
+                        }
                     } else {
                         // No image available
                         output.put("imageURL", "");
