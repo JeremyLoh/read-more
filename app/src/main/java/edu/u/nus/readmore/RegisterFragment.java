@@ -1,5 +1,6 @@
 package edu.u.nus.readmore;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -150,7 +151,10 @@ public class RegisterFragment extends Fragment {
 
     private void updateUI(FirebaseUser user) {
         if (user != null) {
-            backToLogin();
+            // Go back to MainActivity (Homepage)
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            startActivity(intent);
+            getActivity().finish();
         } else {
             email.setText(null);
             password.setText(null);
@@ -158,7 +162,7 @@ public class RegisterFragment extends Fragment {
         }
     }
 
-    // directing back to login page
+    // direct back to login page
     private void backToLogin() {
         FragmentTransaction toLoginFt = getActivity()
                 .getSupportFragmentManager()

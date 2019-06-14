@@ -1,6 +1,7 @@
 package edu.u.nus.readmore;
 
 import android.os.AsyncTask;
+import android.text.TextUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -106,10 +107,9 @@ public class FetchArticleData extends AsyncTask<String, Void, Map<String, String
             String title = pageIDObj.getString("title");
             String fullURL = pageIDObj.getString("fullurl");
             String extract = pageIDObj.getString("extract");
-            // Add additional newlines in extract, (after each sentence)
+            // Add additional newlines in extract, (after each paragraph)
             // remove whitespace at start and end
-            extract = extract.replace(".\n", ".");
-            extract = (extract.replace(". ", ".\n\n")).trim();
+            extract = TextUtils.join("\n\n", (extract.trim()).split("\n+"));
             output.put("title", title);
             output.put("URL", fullURL);
             output.put("description", extract);
