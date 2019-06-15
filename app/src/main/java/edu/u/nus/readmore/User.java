@@ -5,8 +5,8 @@ import java.util.List;
 
 class User {
     private String ID;
-    // readList has a maximum size of 100
-    private final int READLIST_LIMIT = 100;
+    // readList has a maximum size of 1000
+    private final int READLIST_LIMIT = 1000;
     private List<Article> readList;
 
     public User() {
@@ -28,6 +28,10 @@ class User {
         return readList;
     }
 
+    public boolean hasReadArticle(Article article) {
+        return readList.contains(article);
+    }
+
     public void addReadArticle(Article article) {
         // check if limit has been reached
         if (READLIST_LIMIT == this.readList.size()) {
@@ -35,5 +39,14 @@ class User {
             readList.remove(0);
         }
         this.readList.add(article);
+    }
+
+    public Article getLatestArticle() {
+        int readListSize = readList.size();
+        if (readListSize == 0) {
+            return null;
+        } else {
+            return readList.get(readListSize - 1);
+        }
     }
 }
