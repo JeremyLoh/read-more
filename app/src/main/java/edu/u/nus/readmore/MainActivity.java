@@ -12,6 +12,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Article currentArticle = null;
     private ScrollView articleScrollView;
     private final List<String> listOfTopics = Arrays.asList("Science");
+    private User user1;
 
     // onCreateOptionsMenu is called once
     @Override
@@ -378,6 +380,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         })
                         .setNegativeButton("No", null)
                         .show();
+            case R.id.filter:
+                String filterKey = getString(R.string.filter_key);
+                String filterValue = "filter";
+                startIntermediateActivity(filterKey, filterValue);
+                break;
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;

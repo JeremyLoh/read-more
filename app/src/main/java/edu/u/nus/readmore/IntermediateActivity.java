@@ -107,11 +107,17 @@ public class IntermediateActivity extends AppCompatActivity {
                     .commit();
         } else if (currentIntent.hasExtra(getString(R.string.settings_key)) && savedInstanceState == null) {
             // Set name of Action Bar
-            getSupportActionBar().setTitle("Settings");
+            getSupportActionBar().setTitle(R.string.settings_key);
             // Loads SettingsFragment
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.intermediate_frame_layout, new SettingsFragment())
+                    .commit();
+        } else if (currentIntent.hasExtra(getString(R.string.filter_key)) && savedInstanceState == null) {
+            getSupportActionBar().setTitle(getString(R.string.filter_key));
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.intermediate_frame_layout, new FilterFragment())
                     .commit();
         }
     }

@@ -9,4 +9,11 @@
     <!-- Key values for Navigation Drawer Intents -->
     <string name="login_key">Login</string>
     <string name="settings_key">Settings</string>
+    <string name="filter_key">Filter</string>
+
+    <!-- Filter fragment-->
+    <string name="arts">Arts</string>
+    <string name="history">History</string>
+    <string name="mathematics">Math</string>
+    <string name="science">Science</string>
 </resources>
