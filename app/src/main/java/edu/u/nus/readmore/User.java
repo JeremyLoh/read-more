@@ -29,6 +29,9 @@ class User {
     }
 
     public boolean hasReadArticle(Article article) {
+        if (readList.size() == 0) {
+            return false;
+        }
         return readList.contains(article);
     }
 

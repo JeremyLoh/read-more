@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Article currentArticle = null;
     private ScrollView articleScrollView;
     private final List<String> listOfTopics = Arrays.asList("Science");
+    private User currentUser = null;
+    private boolean changedCurrentUser;
 
     // onCreateOptionsMenu is called once
     @Override
@@ -99,6 +101,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void logout() {
+        if (changedCurrentUser) {
+            updateUserDatabase(currentUser);
+        }
         mFirebaseAuth.signOut();
         Toast
                 .makeText(this,
@@ -129,11 +134,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     navigationView.getMenu().clear();
                     navigationView.inflateMenu(R.menu.drawer_menu_user);
                     isLoggedIn = true;
+                    if (currentUser == null) {
+                        setCurrentUser();
+                        changedCurrentUser = false;
+                    }
                 } else {
                     // user is signed out
                     navigationView.getMenu().clear();
                     navigationView.inflateMenu(R.menu.drawer_menu_login);
                     isLoggedIn = false;
+                    currentUser = null;
+                    changedCurrentUser = false;
                 }
                 // declare that the options menu has changed, so should be recreated.
                 // calls onCreateOptionsMenu method when menu needs to be displayed again
@@ -153,16 +164,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         nextArticleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // check if user is logged in
-                FirebaseUser firebaseUser = mFirebaseAuth.getCurrentUser();
-                if (firebaseUser != null) {
-                    // Logged in, Save current article to user readList in database
-                    String userID = firebaseUser.getUid();
-                    addToReadList(userID, currentArticle);
-                    // Get new article
+                 if (currentUser == null) {
+                    // Guest mode, random article generated, displayed
                     getNewArticle();
                 } else {
-                    // Guest mode, random article generated, displayed
+                    // Save current article
+                    addToReadList(currentArticle);
+                    // Get new article, check user readList for duplicate article
                     getNewArticle();
                 }
             }
@@ -186,32 +194,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (savedInstanceState == null) {
             // Check if user is logged in
             FirebaseUser firebaseUser = mFirebaseAuth.getCurrentUser();
-            if (firebaseUser != null) {
-                // Get user object
-                final String userID = firebaseUser.getUid();
-                DocumentReference userDoc = db.collection("Users").document(userID);
-                userDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        User user = documentSnapshot.toObject(User.class);
-                        // Check read list for most recent Article
-                        if (user != null) {
-                            Article latestArticle = getLatestArticle(user);
-                            if (latestArticle == null) {
-                                getNewArticle();
-                            } else {
-                                currentArticle = latestArticle;
-                                displayArticle(latestArticle);
-                            }
-                        } else {
+            // Get user object
+            final String userID = firebaseUser.getUid();
+            DocumentReference userDoc = db.collection("Users").document(userID);
+            userDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    User user = documentSnapshot.toObject(User.class);
+                    currentUser = user;
+                    // Check read list for most recent Article
+                    if (user != null) {
+                        Article latestArticle = user.getLatestArticle();
+                        if (latestArticle == null) {
                             getNewArticle();
+                        } else {
+                            currentArticle = latestArticle;
+                            displayArticle(currentArticle);
                         }
+                    } else {
+                        getNewArticle();
                     }
-                });
-            } else {
-                // Guest mode, random article generated, displayed
-                getNewArticle();
-            }
+                }
+            });
         } else {
             currentArticle = new Article(savedInstanceState.getString("title"),
                     savedInstanceState.getString("description"),
@@ -222,47 +226,40 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private Article getLatestArticle(User user) {
-        List<Article> readList = user.getReadList();
-        int readListSize = readList.size();
-        if (readListSize == 0) {
-            return null;
+    private void setCurrentUser() {
+        // check if user is logged in
+        FirebaseUser firebaseUser = mFirebaseAuth.getCurrentUser();
+        if (firebaseUser != null) {
+            // Logged in
+            final String userID = firebaseUser.getUid();
+            DocumentReference userDoc = db.collection("Users").document(userID);
+            userDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    User user = documentSnapshot.toObject(User.class);
+                    currentUser = user;
+                }
+            });
         } else {
-            return readList.get(readListSize - 1);
+            currentUser = null;
         }
     }
 
-    private void addToReadList(final String userID, final Article article) {
-        DocumentReference userDoc = db.collection("Users").document(userID);
-        userDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                User user = documentSnapshot.toObject(User.class);
-                if (user != null) {
-                    // Add Article to read list
-                    if (article != null) {
-                        user.addReadArticle(article);
-                    }
-                    // Update database
-                    db.collection("Users")
-                            .document(userID)
-                            .set(user, SetOptions.merge());
-                }
-            }
-        });
+    private void updateUserDatabase(User user) {
+        String userID = mFirebaseAuth.getCurrentUser().getUid();
+        // Update database
+        db.collection("Users")
+                .document(userID)
+                .set(user, SetOptions.merge());
     }
 
-    /**
-     * Starts a new Intent, with extra information given based on key and value passed to
-     * Function.
-     *
-     * @param key   Used to identify intent
-     * @param value Used to identify intent
-     */
-    private void startIntermediateActivity(String key, String value) {
-        Intent startIntent = new Intent(getApplicationContext(), IntermediateActivity.class);
-        startIntent.putExtra(key, value);
-        startActivity(startIntent);
+    private void addToReadList(Article article) {
+        if (currentUser != null && article != null) {
+            if (!currentUser.hasReadArticle(article)) {
+                changedCurrentUser = true;
+                currentUser.addReadArticle(article);
+            }
+        }
     }
 
     /**
@@ -322,6 +319,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 output.get("pageid"),
                 output.get("URL"),
                 output.get("imageURL"));
+        if (currentUser != null) {
+            while (currentUser.hasReadArticle(currentArticle)) {
+                getNewArticle();
+            }
+        }
         displayArticle(currentArticle);
         // Scroll to top
         articleScrollView.smoothScrollTo(0, 0);
@@ -367,6 +369,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 String settingsValue = "settings";
                 startIntermediateActivity(settingsKey, settingsValue);
                 break;
+            case R.id.edit_profile:
+                String editProfileKey = getString(R.string.edit_profile_key);
+                String editProfileValue = "editProfile";
+                startIntermediateActivity(editProfileKey, editProfileValue);
+                break;
             case R.id.log_out:
                 new AlertDialog.Builder(this)
                         .setTitle("Logout")
@@ -391,11 +398,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    /**
+     * Starts a new Intent, with extra information given based on key and value passed to
+     * Function.
+     *
+     * @param key   Used to identify intent
+     * @param value Used to identify intent
+     */
+    private void startIntermediateActivity(String key, String value) {
+        Intent startIntent = new Intent(getApplicationContext(), IntermediateActivity.class);
+        startIntent.putExtra(key, value);
+        startActivity(startIntent);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mFirebaseAuthStateListener);
-
     }
 
     @Override
@@ -404,6 +423,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (mFirebaseAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mFirebaseAuthStateListener);
         }
+        if (isFinishing()) {
+            if (changedCurrentUser) {
+                updateUserDatabase(currentUser);
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @Override

@@ -31,9 +31,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:17.0.0'
     implementation 'com.google.firebase:firebase-firestore:19.0.1'
     implementation 'org.jetbrains:annotations-java5:15.0'
-    implementation 'com.android.support:gridlayout-v7:28.0.0'
-
-    //Testing purposes
     implementation 'com.android.support:cardview-v7:28.0.0'
-
+    implementation 'androidx.annotation:annotation:1.1.0' // for @androidx.annotation.Nullable in Article.java
+    implementation 'com.android.support:multidex:1.0.3'
 }

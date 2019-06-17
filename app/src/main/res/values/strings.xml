@@ -10,10 +10,12 @@
     <string name="login_key">Login</string>
     <string name="settings_key">Settings</string>
     <string name="filter_key">Filter</string>
-
     <!-- Filter fragment-->
     <string name="arts">Arts</string>
     <string name="history">History</string>
     <string name="mathematics">Math</string>
     <string name="science">Science</string>
+    <string name="edit_profile_key">Edit Profile</string>
+    <!-- Values for edit profile fragment -->
+    <string name="delete_account_text">Delete Account</string>
 </resources>
