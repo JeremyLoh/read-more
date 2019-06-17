@@ -1,23 +1,36 @@
 package edu.u.nus.readmore;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-class User {
+class User implements Serializable {
     private String ID;
     // readList has a maximum size of 1000
     private final int READLIST_LIMIT = 1000;
     private List<Article> readList;
+    private Map<String, Boolean> userFilter = new HashMap<>();
 
     public User() {
         // public no-arg constructor needed
         this.ID = "";
         readList = new ArrayList<>();
+        userFilter.put("Arts", true);
+        userFilter.put("History", true);
+        userFilter.put("Math", true);
+        userFilter.put("Science", true);
+
     }
 
     public User(String ID) {
         this.ID = ID;
         readList = new ArrayList<>();
+        userFilter.put("Arts", true);
+        userFilter.put("History", true);
+        userFilter.put("Math", true);
+        userFilter.put("Science", true);
     }
 
     public String getID() {
@@ -27,6 +40,8 @@ class User {
     public List<Article> getReadList() {
         return readList;
     }
+
+    public Map<String, Boolean> getUserFilter() { return userFilter; }
 
     public boolean hasReadArticle(Article article) {
         if (readList.size() == 0) {
@@ -51,5 +66,9 @@ class User {
         } else {
             return readList.get(readListSize - 1);
         }
+    }
+
+    public void updateUserFilter(Map<String, Boolean> userFilter) {
+        this.userFilter = userFilter;
     }
 }
