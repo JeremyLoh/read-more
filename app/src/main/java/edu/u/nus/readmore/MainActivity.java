@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Article currentArticle = null;
     private ScrollView articleScrollView;
     private final List<String> listOfTopics = Arrays.asList("Science");
-    private User user1;
 
     // onCreateOptionsMenu is called once
     @Override
@@ -160,18 +159,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     // Logged in, Save current article to user readList in database
                     String userID = firebaseUser.getUid();
                     addToReadList(userID, currentArticle);
-                    // Get new article, check user readList for duplicate article
+                    // Get new article
                     getNewArticle();
-                    DocumentReference userDoc = db.collection("Users").document(userID);
-                    userDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                            User user = documentSnapshot.toObject(User.class);
-                            while (user.hasReadArticle(currentArticle)) {
-                                getNewArticle();
-                            }
-                        }
-                    });
                 } else {
                     // Guest mode, random article generated, displayed
                     getNewArticle();
@@ -207,10 +196,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         User user = documentSnapshot.toObject(User.class);
                         // Check read list for most recent Article
                         if (user != null) {
-                            Article latestArticle = user.getLatestArticle();
+                            Article latestArticle = getLatestArticle(user);
                             if (latestArticle == null) {
                                 getNewArticle();
                             } else {
+                                currentArticle = latestArticle;
                                 displayArticle(latestArticle);
                             }
                         } else {
@@ -232,6 +222,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    private Article getLatestArticle(User user) {
+        List<Article> readList = user.getReadList();
+        int readListSize = readList.size();
+        if (readListSize == 0) {
+            return null;
+        } else {
+            return readList.get(readListSize - 1);
+        }
+    }
+
     private void addToReadList(final String userID, final Article article) {
         DocumentReference userDoc = db.collection("Users").document(userID);
         userDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -241,9 +241,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (user != null) {
                     // Add Article to read list
                     if (article != null) {
-                        if (!user.hasReadArticle(article)) {
-                            user.addReadArticle(article);
-                        }
+                        user.addReadArticle(article);
                     }
                     // Update database
                     db.collection("Users")
@@ -325,6 +323,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 output.get("URL"),
                 output.get("imageURL"));
         displayArticle(currentArticle);
+        // Scroll to top
+        articleScrollView.smoothScrollTo(0, 0);
     }
 
     private void displayArticle(Article article) {
@@ -339,8 +339,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     execute(article.getImageURL());
             browserDirectView(articleImageView, article.getURL());
         }
-        // Scroll to top
-        articleScrollView.smoothScrollTo(0, 0);
     }
 
     private void browserDirectView(View view, final String URL) {
@@ -360,12 +358,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.nav_login:
-                String loginKey = getString(R.string.login_key);
+                String loginKey = "Login";
                 String loginValue = "login";
                 startIntermediateActivity(loginKey, loginValue);
                 break;
             case R.id.nav_settings:
-                String settingsKey = getString(R.string.settings_key);
+                String settingsKey = "Settings";
                 String settingsValue = "settings";
                 startIntermediateActivity(settingsKey, settingsValue);
                 break;
@@ -382,8 +380,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         })
                         .setNegativeButton("No", null)
                         .show();
+                break;
             case R.id.filter:
-                String filterKey = getString(R.string.filter_key);
+                String filterKey = "Filter";
                 String filterValue = "filter";
                 startIntermediateActivity(filterKey, filterValue);
                 break;
@@ -432,6 +431,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+
         // storing article content into outState which retrieve back in onCreate
         outState.putString("title", currentArticle.getTitle());
         outState.putString("description", currentArticle.getDescription());

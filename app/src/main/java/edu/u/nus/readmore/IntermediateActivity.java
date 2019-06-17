@@ -49,6 +49,9 @@ public class IntermediateActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 logout();
+                                // ADded this line here to prevent user left in unintended fragments
+                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                startActivity(intent);
                             }
                         })
                         .setNegativeButton("No", null)
