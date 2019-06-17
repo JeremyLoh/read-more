@@ -113,6 +113,14 @@ public class IntermediateActivity extends AppCompatActivity {
                     .beginTransaction()
                     .replace(R.id.intermediate_frame_layout, new SettingsFragment())
                     .commit();
+        } else if (currentIntent.hasExtra(getString(R.string.edit_profile_key)) && savedInstanceState == null) {
+            // Set name of Action Bar
+            getSupportActionBar().setTitle("Edit Profile");
+            // Load EditProfileFragment
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.intermediate_frame_layout, new EditProfileFragment())
+                    .commit();
         }
     }
 

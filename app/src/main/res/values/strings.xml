@@ -9,4 +9,7 @@
     <!-- Key values for Navigation Drawer Intents -->
     <string name="login_key">Login</string>
     <string name="settings_key">Settings</string>
+    <string name="edit_profile_key">Edit Profile</string>
+    <!-- Values for edit profile fragment -->
+    <string name="delete_account_text">Delete Account</string>
 </resources>
