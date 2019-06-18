@@ -169,9 +169,7 @@ public class LoginFragment extends Fragment {
                                 Toast.makeText(getActivity().getApplicationContext(),
                                         "Login Successful!",
                                         Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(getActivity().getApplicationContext(),
-                                        MainActivity.class);
-                                startActivity(intent);
+                                getActivity().finish();
                             } else {
                                 Toast.makeText(getActivity().getApplicationContext(),
                                         "Login unsuccessful, please try again",
@@ -240,7 +238,6 @@ public class LoginFragment extends Fragment {
             loadLoginPage.putExtra(getString(R.string.login_key), "login");
             startActivity(loadLoginPage);
         }
-
     }
 
 

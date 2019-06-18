@@ -195,27 +195,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             // Check if user is logged in
             FirebaseUser firebaseUser = mFirebaseAuth.getCurrentUser();
             // Get user object
-            final String userID = firebaseUser.getUid();
-            DocumentReference userDoc = db.collection("Users").document(userID);
-            userDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    User user = documentSnapshot.toObject(User.class);
-                    currentUser = user;
-                    // Check read list for most recent Article
-                    if (user != null) {
-                        Article latestArticle = user.getLatestArticle();
-                        if (latestArticle == null) {
-                            getNewArticle();
+            if (firebaseUser != null) {
+                final String userID = firebaseUser.getUid();
+                DocumentReference userDoc = db.collection("Users").document(userID);
+                userDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        User user = documentSnapshot.toObject(User.class);
+                        currentUser = user;
+                        // Check read list for most recent Article
+                        if (user != null) {
+                            Article latestArticle = user.getLatestArticle();
+                            if (latestArticle == null) {
+                                getNewArticle();
+                            } else {
+                                currentArticle = latestArticle;
+                                displayArticle(currentArticle);
+                            }
                         } else {
-                            currentArticle = latestArticle;
-                            displayArticle(currentArticle);
+                            getNewArticle();
                         }
-                    } else {
-                        getNewArticle();
                     }
-                }
-            });
+                });
+            } else {
+                getNewArticle();
+            }
         } else {
             currentArticle = new Article(savedInstanceState.getString("title"),
                     savedInstanceState.getString("description"),
@@ -334,8 +338,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         articleContentTextView.setText(article.getDescription());
         String imageURL = article.getImageURL();
         if (imageURL.equals("")) {
-            // Display default image
+            // Hide article image view
+            articleImageView.setVisibility(View.GONE);
         } else {
+            // Show article image view
+            articleImageView.setVisibility(View.VISIBLE);
             // Retrieve image and set to article ImageView
             new DownloadImageTask((ImageView) findViewById(R.id.articleImageView)).
                     execute(article.getImageURL());

@@ -152,8 +152,6 @@ public class RegisterFragment extends Fragment {
     private void updateUI(FirebaseUser user) {
         if (user != null) {
             // Go back to MainActivity (Homepage)
-            Intent intent = new Intent(getActivity(), MainActivity.class);
-            startActivity(intent);
             getActivity().finish();
         } else {
             email.setText(null);
