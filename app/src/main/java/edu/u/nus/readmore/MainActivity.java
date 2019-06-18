@@ -38,6 +38,7 @@ import com.google.firebase.firestore.util.Util;
 
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -62,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private final List<String> listOfTopics = Arrays.asList("Science");
     private User currentUser = null;
     private boolean changedCurrentUser;
+    static MainActivity INSTANCE;
 
     // onCreateOptionsMenu is called once
     @Override
@@ -116,6 +118,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // required for passing information from MainActivity to Filter
+        INSTANCE = this;
 
         if (TESTING_DB) {
             FetchData fd = new FetchData();
@@ -227,6 +232,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     savedInstanceState.getString("URL"),
                     savedInstanceState.getString("imageURL"));
             displayArticle(currentArticle);
+            if (mFirebaseAuth.getCurrentUser() != null) {
+                currentUser = (User) savedInstanceState.getSerializable("User");
+            }
         }
     }
 
@@ -373,13 +381,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_settings:
                 String settingsKey = "Settings";
-                String settingsValue = "settings";
-                startIntermediateActivity(settingsKey, settingsValue);
+                if (mFirebaseAuth.getCurrentUser() != null) {
+                    startInterActHashMap(settingsKey);
+                } else {
+                    String settingsValue = "settings";
+                    startIntermediateActivity(settingsKey, settingsValue);
+                }
                 break;
             case R.id.edit_profile:
-                String editProfileKey = getString(R.string.edit_profile_key);
-                String editProfileValue = "editProfile";
-                startIntermediateActivity(editProfileKey, editProfileValue);
+                String editProfileKey = "Edit Profile";
+                startInterActHashMap(editProfileKey);
                 break;
             case R.id.log_out:
                 new AlertDialog.Builder(this)
@@ -397,12 +408,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.filter:
                 String filterKey = "Filter";
-                String filterValue = "filter";
-                startIntermediateActivity(filterKey, filterValue);
+                startInterActHashMap(filterKey);
                 break;
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void startInterActHashMap(String key) {
+        HashMap<String, Boolean> userFilter =
+                (HashMap<String, Boolean>) currentUser.getUserFilter();
+        Intent startIntent = new Intent(getApplicationContext(), IntermediateActivity.class);
+        startIntent.putExtra(key, userFilter);
+        startActivity(startIntent);
     }
 
     /**
@@ -464,6 +482,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    public static MainActivity getActivityInstance() {
+        return INSTANCE;
+    }
+
+    public void updateCurrentUserFilter(Map<String, Boolean> updatedFilter) {
+        currentUser.updateUserFilter(updatedFilter);
+        changedCurrentUser = true;
+    }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -474,5 +501,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         outState.putString("pageid", currentArticle.getPageid());
         outState.putString("URL", currentArticle.getURL());
         outState.putString("imageURL", currentArticle.getImageURL());
+
+        // For rotating screen plus changing user filter
+        if (currentUser != null) {
+            outState.putSerializable("User", currentUser);
+        }
     }
 }

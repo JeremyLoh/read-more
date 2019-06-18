@@ -6,20 +6,25 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Filter;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class IntermediateActivity extends AppCompatActivity {
     private Menu optionsMenu;
     private MenuItem logoutItem;
     private boolean isLoggedIn;
-
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mFirebaseAuthStateListener;
+    private Map<String, Boolean> uFilterHashMap;
 
     // onCreateOptionsMenu is called once
     @Override
@@ -75,6 +80,7 @@ public class IntermediateActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intermediate);
 
+
         // Action bar is used instead of custom toolbar!
         // Adds back button for default action bar
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -111,18 +117,32 @@ public class IntermediateActivity extends AppCompatActivity {
         } else if (currentIntent.hasExtra(getString(R.string.settings_key)) && savedInstanceState == null) {
             // Set name of Action Bar
             getSupportActionBar().setTitle(R.string.settings_key);
+            if (mFirebaseAuth.getCurrentUser() != null) {
+                // Setting uFilter if user access other IntermediateActivity first
+                uFilterHashMap =
+                        (HashMap<String, Boolean>) getIntent().getSerializableExtra("Settings");
+            }
             // Loads SettingsFragment
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.intermediate_frame_layout, new SettingsFragment())
                     .commit();
         } else if (currentIntent.hasExtra(getString(R.string.filter_key)) && savedInstanceState == null) {
+            Bundle bundle = new Bundle();
+            uFilterHashMap =
+                    (HashMap<String, Boolean>) getIntent().getSerializableExtra("Filter");
+            bundle.putSerializable("Filter", (HashMap<String, Boolean>) uFilterHashMap);
+            FilterFragment filterFragment = new FilterFragment();
+            filterFragment.setArguments(bundle);
             getSupportActionBar().setTitle(getString(R.string.filter_key));
             getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.intermediate_frame_layout, new FilterFragment())
+                    .replace(R.id.intermediate_frame_layout, filterFragment)
                     .commit();
         } else if (currentIntent.hasExtra(getString(R.string.edit_profile_key)) && savedInstanceState == null) {
+            // Setting uFilter if user access other IntermediateActivity first
+            uFilterHashMap =
+                    (HashMap<String, Boolean>) getIntent().getSerializableExtra("Edit Profile");
             // Set name of Action Bar
             getSupportActionBar().setTitle("Edit Profile");
             // Load EditProfileFragment
@@ -130,6 +150,10 @@ public class IntermediateActivity extends AppCompatActivity {
                     .beginTransaction()
                     .replace(R.id.intermediate_frame_layout, new EditProfileFragment())
                     .commit();
+        }
+
+        if (savedInstanceState != null && mFirebaseAuth.getCurrentUser() != null) {
+            uFilterHashMap = (HashMap<String, Boolean>) savedInstanceState.getSerializable("Filter");
         }
     }
 
@@ -142,8 +166,12 @@ public class IntermediateActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        Log.d("pause", "called");
         if (mFirebaseAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mFirebaseAuthStateListener);
+        }
+        if (isFinishing() && mFirebaseAuth.getCurrentUser() != null) {
+            MainActivity.getActivityInstance().updateCurrentUserFilter(uFilterHashMap);
         }
     }
 
@@ -151,5 +179,17 @@ public class IntermediateActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         finish();
         return true;
+    }
+
+    public void updateUserFilterAtInter(Map<String, Boolean> updatedUserFilter) {
+        uFilterHashMap = updatedUserFilter;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mFirebaseAuth.getCurrentUser() != null) {
+            outState.putSerializable("Filter", (HashMap<String, Boolean>) uFilterHashMap);
+        }
     }
 }
