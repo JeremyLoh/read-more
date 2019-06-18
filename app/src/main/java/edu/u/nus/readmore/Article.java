@@ -1,6 +1,8 @@
 package edu.u.nus.readmore;
 
-class Article {
+import java.io.Serializable;
+
+class Article implements Serializable {
     private String title;
     private String description;
     private String pageid;
