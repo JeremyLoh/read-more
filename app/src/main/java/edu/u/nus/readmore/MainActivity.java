@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Button previousArticleBtn, nextArticleBtn;
     private Article currentArticle = null;
     private ScrollView articleScrollView;
-    private final List<String> listOfTopics = Arrays.asList("Science");
+    private final List<String> listOfTopics = Arrays.asList("science");
     private User currentUser = null;
     private boolean changedCurrentUser;
     static MainActivity INSTANCE;
@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         INSTANCE = this;
 
         if (TESTING_DB) {
-            FetchData fd = new FetchData();
+            FetchData fd = new FetchData(getApplicationContext());
             fd.execute();
         }
 
