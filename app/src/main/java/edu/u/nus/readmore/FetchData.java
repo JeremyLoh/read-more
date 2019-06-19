@@ -51,8 +51,6 @@ class FetchData extends AsyncTask<Void, Void, Void> {
                 if (topicList != null) {
                     // Read and store topics
                     for (String topic : topicList) {
-                        Log.d("TOPIC ", topic);
-
                         String data = "";
                         String urlStr = "https://en.wikipedia.org/w/api.php?" +
                                 "action=query&format=json" +
@@ -81,6 +79,10 @@ class FetchData extends AsyncTask<Void, Void, Void> {
                         for (int i = 0; i < jsonArrayLength; i++) {
                             JSONObject obj = (JSONObject) jsonArray.get(i);
                             pageidArr.add(obj.getString("pageid"));
+                        }
+
+                        if (pageidArr.size() == 0) {
+                            continue;
                         }
 
                         Map<String, Object> item = new HashMap<>();
