@@ -12,16 +12,10 @@ class User implements Serializable {
     private final int READLIST_LIMIT = 1000;
     private List<Article> readList;
     private Map<String, Boolean> userFilter = new HashMap<>();
+    private int readIndex = -1;
 
     public User() {
         // public no-arg constructor needed
-        this.ID = "";
-        readList = new ArrayList<>();
-        userFilter.put("Arts", true);
-        userFilter.put("History", true);
-        userFilter.put("Math", true);
-        userFilter.put("Science", true);
-
     }
 
     public User(String ID) {
@@ -41,7 +35,17 @@ class User implements Serializable {
         return readList;
     }
 
-    public Map<String, Boolean> getUserFilter() { return userFilter; }
+    public int getREADLIST_LIMIT() {
+        return READLIST_LIMIT;
+    }
+
+    public int getReadIndex() {
+        return readIndex;
+    }
+
+    public Map<String, Boolean> getUserFilter() {
+        return userFilter;
+    }
 
     public boolean hasReadArticle(Article article) {
         if (readList.size() == 0) {
@@ -61,10 +65,34 @@ class User implements Serializable {
 
     public Article getLatestArticle() {
         int readListSize = readList.size();
-        if (readListSize == 0) {
+        if (readListSize == 0 || readIndex < 0) {
             return null;
         } else {
-            return readList.get(readListSize - 1);
+            return readList.get(readIndex);
+        }
+    }
+
+    public Article getPreviousArticle() {
+        if (readIndex > 0) {
+            readIndex--;
+            return readList.get(readIndex);
+        } else {
+            return null;
+        }
+    }
+
+    public Article getNextArticle() {
+        if (readIndex + 1 < readList.size()) {
+            readIndex++;
+            return readList.get(readIndex);
+        } else {
+            return null;
+        }
+    }
+
+    public void incrementReadIndex() {
+        if (readIndex + 1 < readList.size()) {
+            readIndex++;
         }
     }
 

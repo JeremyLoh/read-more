@@ -87,11 +87,11 @@ public class EditProfileFragment extends Fragment {
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
-                                            user.delete();
                                             // Delete user data in firestore
                                             db.collection("Users")
                                                     .document(userID)
                                                     .delete();
+                                            user.delete();
                                             // Redirect to MainActivity
                                             getActivity().finish();
                                         }

@@ -95,17 +95,19 @@
                     android:id="@+id/changeArticleLinearLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="16dp"
                     android:orientation="horizontal">
 
                     <Button
                         android:id="@+id/previousArticleBtn"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16sp"
                         android:layout_weight="1"
                         android:drawableStart="@drawable/ic_arrow_upward_black_24dp"
                         android:fontFamily="sans-serif-black"
-                        android:padding="16sp"
+                        android:padding="16dp"
                         android:text="@string/previous_article_text"
                         android:textStyle="bold" />
 
@@ -113,11 +115,10 @@
                         android:id="@+id/nextArticleBtn"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="16sp"
                         android:layout_weight="1"
                         android:drawableEnd="@drawable/ic_arrow_downward_black_24dp"
                         android:fontFamily="sans-serif-black"
-                        android:padding="16sp"
+                        android:padding="16dp"
                         android:text="@string/next_article_text"
                         android:textStyle="bold" />
                 </LinearLayout>

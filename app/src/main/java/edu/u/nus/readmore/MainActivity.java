@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Button previousArticleBtn, nextArticleBtn;
     private Article currentArticle = null;
     private ScrollView articleScrollView;
-    private final List<String> listOfTopics = Arrays.asList("Science");
+    private final List<String> listOfTopics = Arrays.asList("science");
     private User currentUser = null;
     private boolean changedCurrentUser;
     static MainActivity INSTANCE;
@@ -123,9 +123,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         INSTANCE = this;
 
         if (TESTING_DB) {
-            FetchData fd = new FetchData();
+            FetchData fd = new FetchData(getApplicationContext());
             fd.execute();
         }
+
+        // Initialise article components
+        articleTitleTextView = findViewById(R.id.articleTitleTextView);
+        articleContentTextView = findViewById(R.id.articleContentTextView);
+        articleImageView = findViewById(R.id.articleImageView);
+        previousArticleBtn = findViewById(R.id.previousArticleBtn);
+        nextArticleBtn = findViewById(R.id.nextArticleBtn);
+        articleScrollView = findViewById(R.id.articleScrollView);
 
         // Initialise Firebase components
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -139,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     navigationView.getMenu().clear();
                     navigationView.inflateMenu(R.menu.drawer_menu_user);
                     isLoggedIn = true;
+                    previousArticleBtn.setVisibility(View.VISIBLE);
                     if (currentUser == null) {
                         setCurrentUser();
                         changedCurrentUser = false;
@@ -148,6 +157,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     navigationView.getMenu().clear();
                     navigationView.inflateMenu(R.menu.drawer_menu_login);
                     isLoggedIn = false;
+                    previousArticleBtn.setVisibility(View.GONE);
                     currentUser = null;
                     changedCurrentUser = false;
                 }
@@ -157,27 +167,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         };
 
-        // Initialise article components
-        articleTitleTextView = findViewById(R.id.articleTitleTextView);
-        articleContentTextView = findViewById(R.id.articleContentTextView);
-        articleImageView = findViewById(R.id.articleImageView);
-        previousArticleBtn = findViewById(R.id.previousArticleBtn);
-        nextArticleBtn = findViewById(R.id.nextArticleBtn);
-        articleScrollView = findViewById(R.id.articleScrollView);
-
         // Add onClickListeners for article buttons
         nextArticleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 if (currentUser == null) {
+                if (currentUser == null) {
                     // Guest mode, random article generated, displayed
                     getNewArticle();
                 } else {
-                    // Save current article
-                    addToReadList(currentArticle);
-                    // Get new article, check user readList for duplicate article
-                    getNewArticle();
+                    Article nextArticle = currentUser.getNextArticle();
+                    if (nextArticle != null) {
+                        currentArticle = nextArticle;
+                        displayArticle(currentArticle);
+                    } else {
+                        addToReadList(currentArticle);
+                        // Get new article, check user readList for duplicate article
+                        // Add to user readlist
+                        getNewArticle();
+                        currentUser.incrementReadIndex();
+                    }
                 }
+            }
+        });
+
+        previousArticleBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Article previousArticle = currentUser.getPreviousArticle();
+                if (previousArticle != null) {
+                    currentArticle = previousArticle;
+                }
+                displayArticle(currentArticle);
             }
         });
 
@@ -250,6 +270,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
                     User user = documentSnapshot.toObject(User.class);
                     currentUser = user;
+                    Article latestArticle = currentUser.getLatestArticle();
+                    if (latestArticle != null) {
+                        currentArticle = latestArticle;
+                        displayArticle(latestArticle);
+                    }
                 }
             });
         } else {
@@ -346,10 +371,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             while (currentUser.hasReadArticle(currentArticle)) {
                 getNewArticle();
             }
+            // Save current article
+            addToReadList(currentArticle);
         }
         displayArticle(currentArticle);
-        // Scroll to top
-        articleScrollView.smoothScrollTo(0, 0);
     }
 
     private void displayArticle(Article article) {
@@ -367,6 +392,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     execute(article.getImageURL());
             browserDirectView(articleImageView, article.getURL());
         }
+        // Scroll to top
+        articleScrollView.smoothScrollTo(0, 0);
     }
 
     private void browserDirectView(View view, final String URL) {
