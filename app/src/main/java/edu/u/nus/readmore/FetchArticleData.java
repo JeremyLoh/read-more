@@ -1,7 +1,12 @@
 package edu.u.nus.readmore;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.text.TextUtils;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.ProgressBar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,9 +27,17 @@ public class FetchArticleData extends AsyncTask<String, Void, Map<String, String
     AsyncArticleResponse articleResponse = null;
     private Map<String, String> output = new HashMap<>();
 
+
     public FetchArticleData(AsyncArticleResponse asyncArticleResponse) {
         this.articleResponse = asyncArticleResponse;
     }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        MainActivity.getActivityInstance().enableProgressBar(View.VISIBLE);
+    }
+
 
     @Override
     protected Map<String, String> doInBackground(String... pageID) {
@@ -165,6 +178,7 @@ public class FetchArticleData extends AsyncTask<String, Void, Map<String, String
     @Override
     protected void onPostExecute(Map<String, String> stringStringMap) {
         articleResponse.processFinish(stringStringMap);
+        MainActivity.getActivityInstance().disableProgressBar(View.GONE);
         super.onPostExecute(stringStringMap);
     }
 }

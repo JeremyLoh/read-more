@@ -2,6 +2,7 @@ package edu.u.nus.readmore;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -16,8 +17,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawer;
     private Menu optionsMenu;
     private MenuItem logoutItem;
+    private ProgressBar progressBar;
     private boolean isLoggedIn;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mFirebaseAuthStateListener;
@@ -56,9 +60,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView navigationView;
     private TextView articleContentTextView, articleTitleTextView;
     private ImageView articleImageView;
+    private ScrollView articleScrollView;
     private Button previousArticleBtn, nextArticleBtn;
     private Article currentArticle = null;
-    private ScrollView articleScrollView;
     private final List<String> listOfTopics = Arrays.asList("science");
     private User currentUser = null;
     private boolean changedCurrentUser;
@@ -134,6 +138,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         previousArticleBtn = findViewById(R.id.previousArticleBtn);
         nextArticleBtn = findViewById(R.id.nextArticleBtn);
         articleScrollView = findViewById(R.id.articleScrollView);
+        progressBar = findViewById(R.id.progressBar);
 
         // Initialise Firebase components
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -256,6 +261,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     savedInstanceState.getString("URL"),
                     savedInstanceState.getString("imageURL"));
             displayArticle(currentArticle);
+            articleScrollView.setVisibility(View.VISIBLE);
             if (mFirebaseAuth.getCurrentUser() != null) {
                 currentUser = (User) savedInstanceState.getSerializable("User");
             }
@@ -534,6 +540,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void updateCurrentUserFilter(Map<String, Boolean> updatedFilter) {
         currentUser.updateUserFilter(updatedFilter);
         changedCurrentUser = true;
+    }
+
+    /*
+
+     */
+    public void enableProgressBar(Integer visibility) {
+        progressBar.setVisibility(visibility);
+        articleScrollView.setVisibility(View.INVISIBLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LOCKED);
+    }
+
+    public void disableProgressBar(Integer visibility) {
+        progressBar.setVisibility(visibility);
+        articleScrollView.setVisibility(View.VISIBLE);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+    }
+
+    public void enableImage() {
+        articleImageView.setVisibility(View.VISIBLE);
+    }
+
+    public void disableImage() {
+        articleImageView.setVisibility(View.GONE);
     }
 
     @Override

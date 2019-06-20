@@ -9,7 +9,7 @@
     tools:context=".MainActivity"
     tools:openDrawer="start">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -24,17 +24,26 @@
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:visibility="gone"
+            android:layout_centerInParent="true" />
+
         <ScrollView
             android:id="@+id/articleScrollView"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:fillViewport="true">
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/toolbar"
+            android:fillViewport="true"
+            android:visibility="gone">
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
                 <!-- Card View for Article -->
                 <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/articleCardView"
@@ -54,12 +63,11 @@
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="1"
-                            android:paddingTop="16dp"
                             android:adjustViewBounds="true"
-                            android:maxHeight="300dp"
                             android:clickable="true"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/ic_launcher_background" />
+                            android:maxHeight="300dp"
+                            android:paddingTop="16dp"
+                            android:scaleType="centerCrop" />
                         <!-- Title of Article -->
                         <TextView
                             android:id="@+id/articleTitleTextView"
@@ -95,6 +103,7 @@
                     android:id="@+id/changeArticleLinearLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/articleCardView"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="16dp"
@@ -122,10 +131,10 @@
                         android:text="@string/next_article_text"
                         android:textStyle="bold" />
                 </LinearLayout>
-            </LinearLayout>
+            </RelativeLayout>
         </ScrollView>
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <!--the view of navigation bar-->
     <android.support.design.widget.NavigationView
