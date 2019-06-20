@@ -63,7 +63,7 @@ class User implements Serializable {
         this.readList.add(article);
     }
 
-    public Article getLatestArticle() {
+    public Article accessLatestArticle() {
         int readListSize = readList.size();
         if (readListSize == 0 || readIndex < 0) {
             return null;
@@ -72,7 +72,7 @@ class User implements Serializable {
         }
     }
 
-    public Article getPreviousArticle() {
+    public Article accessPreviousArticle() {
         if (readIndex > 0) {
             readIndex--;
             return readList.get(readIndex);
@@ -81,7 +81,7 @@ class User implements Serializable {
         }
     }
 
-    public Article getNextArticle() {
+    public Article accessNextArticle() {
         if (readIndex + 1 < readList.size()) {
             readIndex++;
             return readList.get(readIndex);

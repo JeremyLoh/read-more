@@ -12,6 +12,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,13 +33,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.util.Util;
 
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private User currentUser = null;
     private boolean changedCurrentUser;
     static MainActivity INSTANCE;
+
+
     // onCreateOptionsMenu is called once
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -149,6 +149,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     isLoggedIn = true;
                     previousArticleBtn.setVisibility(View.VISIBLE);
                     if (currentUser == null) {
+                        Log.d("does it reach", "yes");
                         setCurrentUser();
                         changedCurrentUser = false;
                     }
@@ -175,10 +176,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     // Guest mode, random article generated, displayed
                     getNewArticle();
                 } else {
-                    Article nextArticle = currentUser.getNextArticle();
+                    Article nextArticle = currentUser.accessNextArticle();
                     if (nextArticle != null) {
                         currentArticle = nextArticle;
                         displayArticle(currentArticle);
+
                     } else {
                         addToReadList(currentArticle);
                         // Get new article, check user readList for duplicate article
@@ -186,6 +188,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         getNewArticle();
                         currentUser.incrementReadIndex();
                     }
+                    changedCurrentUser = true;
                 }
             }
         });
@@ -193,9 +196,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         previousArticleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Article previousArticle = currentUser.getPreviousArticle();
+                Article previousArticle = currentUser.accessPreviousArticle();
                 if (previousArticle != null) {
                     currentArticle = previousArticle;
+                    changedCurrentUser = true;
                 }
                 displayArticle(currentArticle);
             }
@@ -230,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         currentUser = user;
                         // Check read list for most recent Article
                         if (user != null) {
-                            Article latestArticle = user.getLatestArticle();
+                            Article latestArticle = user.accessLatestArticle();
                             if (latestArticle == null) {
                                 getNewArticle();
                             } else {
@@ -270,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 public void onSuccess(DocumentSnapshot documentSnapshot) {
                     User user = documentSnapshot.toObject(User.class);
                     currentUser = user;
-                    Article latestArticle = currentUser.getLatestArticle();
+                    Article latestArticle = currentUser.accessLatestArticle();
                     if (latestArticle != null) {
                         currentArticle = latestArticle;
                         displayArticle(latestArticle);
@@ -283,11 +287,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void updateUserDatabase(User user) {
-        String userID = mFirebaseAuth.getCurrentUser().getUid();
+        String userID = user.getID();
         // Update database
         db.collection("Users")
                 .document(userID)
-                .set(user, SetOptions.merge());
+                .set(user);
+        changedCurrentUser = false;
     }
 
     private void addToReadList(Article article) {
@@ -319,6 +324,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     List<DocumentSnapshot> documentList = task.getResult().getDocuments();
+
                     if (documentList == null || documentList.size() == 0) {
                         getNewArticle();
                     } else {
@@ -338,19 +344,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private String randomTopicGenerator() {
         // assuming locally instantiated a list of topics sorted alphabetically
-        if (currentUser != null) {
-            List<String> userFilteredList = new ArrayList<>();
-            for (String topic : listOfTopics) {
-                if (currentUser.getUserFilter().get(topic)) {
-                    userFilteredList.add(topic);
-                }
-            }
-            int randomIndex = new Random().nextInt(userFilteredList.size());
-            return userFilteredList.get(randomIndex);
-        } else {
-            int randomIndex = new Random().nextInt(listOfTopics.size());
-            return listOfTopics.get(randomIndex);
-        }
+//        if (currentUser != null) {
+//            List<String> userFilteredList = new ArrayList<>();
+//            for (String topic : listOfTopics) {
+//                if (currentUser.getUserFilter().get(topic)) {
+//                    userFilteredList.add(topic);
+//                }
+//            }
+//            int randomIndex = new Random().nextInt(userFilteredList.size());
+//            return userFilteredList.get(randomIndex);
+//        } else {
+//            int randomIndex = new Random().nextInt(listOfTopics.size());
+//            return listOfTopics.get(randomIndex);
+//        }
+        return "science";
     }
 
     private void generateArticleContent(String pageid) {
