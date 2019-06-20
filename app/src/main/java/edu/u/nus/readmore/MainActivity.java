@@ -36,7 +36,9 @@ import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.util.Util;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private User currentUser = null;
     private boolean changedCurrentUser;
     static MainActivity INSTANCE;
-
     // onCreateOptionsMenu is called once
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -311,9 +312,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private String randomTopicGenerator() {
-        //TODO
-        int randomIndex = new Random().nextInt(listOfTopics.size());
-        return listOfTopics.get(randomIndex);
+        // assuming locally instantiated a list of topics sorted alphabetically
+        if (currentUser != null) {
+            List<String> userFilteredList = new ArrayList<>();
+            for (String topic : listOfTopics) {
+                if (currentUser.getUserFilter().get(topic)) {
+                    userFilteredList.add(topic);
+                }
+            }
+            int randomIndex = new Random().nextInt(userFilteredList.size());
+            return userFilteredList.get(randomIndex);
+        } else {
+            int randomIndex = new Random().nextInt(listOfTopics.size());
+            return listOfTopics.get(randomIndex);
+        }
     }
 
     private void generateArticleContent(String pageid) {

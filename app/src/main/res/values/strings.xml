@@ -13,7 +13,7 @@
     <!-- Filter fragment-->
     <string name="arts">Arts</string>
     <string name="history">History</string>
-    <string name="mathematics">Math</string>
+    <string name="math">Math</string>
     <string name="science">Science</string>
     <string name="edit_profile_key">Edit Profile</string>
     <!-- Values for edit profile fragment -->
