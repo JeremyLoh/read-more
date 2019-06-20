@@ -81,7 +81,7 @@
                     android:textSize="24sp" />
 
                 <Button
-                    android:id="@+id/filterButtonMathematics"
+                    android:id="@+id/filterButtonMath"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -90,10 +90,16 @@
                     android:layout_marginBottom="16dp"
                     android:layout_weight="1"
                     android:background="@drawable/button_mathematics_background"
-                    android:text="@string/mathematics"
+                    android:text="@string/math"
                     android:textColor="#FFFFFF"
                     android:textSize="24sp" />
             </LinearLayout>
+            <Button
+                android:id="@+id/saveButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Save"
+                android:textSize="24sp"/>
         </LinearLayout>
     </ScrollView>
 

@@ -1,10 +1,11 @@
 package edu.u.nus.readmore;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -16,6 +17,7 @@ public class IntermediateActivity extends AppCompatActivity {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mFirebaseAuthStateListener;
     private Map<String, Boolean> uFilterHashMap;
+    private boolean saveButtonCheck, userClickCheck;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +97,6 @@ public class IntermediateActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d("pause", "called");
         if (mFirebaseAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mFirebaseAuthStateListener);
         }
@@ -107,12 +108,40 @@ public class IntermediateActivity extends AppCompatActivity {
 
     @Override
     public boolean onSupportNavigateUp() {
-        finish();
+        if (userClickCheck && !saveButtonCheck && getIntent().hasExtra("Filter")) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Unsaved filter")
+                    .setMessage("Changes are not saved, proceed without saving?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    })
+                    .setNeutralButton("No", null)
+                    .setCancelable(true)
+                    .show();
+        } else {
+            finish();
+        }
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     public void updateUserFilterAtInter(Map<String, Boolean> updatedUserFilter) {
         uFilterHashMap = updatedUserFilter;
+    }
+
+    public void setSaveButtonCheck(boolean bool) {
+        saveButtonCheck = bool;
+    }
+
+    public void setUserClickCheck(boolean bool) {
+        userClickCheck = bool;
     }
 
     @Override
