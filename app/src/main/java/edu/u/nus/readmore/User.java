@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 class User implements Serializable {
-    private String ID;
+    private String id;
     // readList has a maximum size of 1000
     private final int READLIST_LIMIT = 1000;
     private List<Article> readList;
@@ -18,8 +18,8 @@ class User implements Serializable {
         // public no-arg constructor needed
     }
 
-    public User(String ID) {
-        this.ID = ID;
+    public User(String id) {
+        this.id = id;
         readList = new ArrayList<>();
         userFilter.put("Arts", true);
         userFilter.put("History", true);
@@ -27,15 +27,19 @@ class User implements Serializable {
         userFilter.put("Science", true);
     }
 
-    public String getID() {
-        return ID;
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public List<Article> getReadList() {
         return readList;
     }
 
-    public int getREADLIST_LIMIT() {
+    public int getReadlist_Limit() {
         return READLIST_LIMIT;
     }
 
@@ -61,6 +65,7 @@ class User implements Serializable {
             readList.remove(0);
         }
         this.readList.add(article);
+        incrementReadIndex();
     }
 
     public Article accessLatestArticle() {
@@ -90,7 +95,7 @@ class User implements Serializable {
         }
     }
 
-    public void incrementReadIndex() {
+    private void incrementReadIndex() {
         if (readIndex + 1 < readList.size()) {
             readIndex++;
         }

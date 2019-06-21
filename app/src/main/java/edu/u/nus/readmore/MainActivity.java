@@ -154,9 +154,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     isLoggedIn = true;
                     previousArticleBtn.setVisibility(View.VISIBLE);
                     if (currentUser == null) {
-                        Log.d("does it reach", "yes");
                         setCurrentUser();
-                        changedCurrentUser = false;
                     }
                 } else {
                     // user is signed out
@@ -185,13 +183,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (nextArticle != null) {
                         currentArticle = nextArticle;
                         displayArticle(currentArticle);
-
                     } else {
                         addToReadList(currentArticle);
                         // Get new article, check user readList for duplicate article
                         // Add to user readlist
                         getNewArticle();
-                        currentUser.incrementReadIndex();
                     }
                     changedCurrentUser = true;
                 }
@@ -238,8 +234,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         User user = documentSnapshot.toObject(User.class);
                         currentUser = user;
                         // Check read list for most recent Article
-                        if (user != null) {
-                            Article latestArticle = user.accessLatestArticle();
+                        if (currentUser != null) {
+                            Article latestArticle = currentUser.accessLatestArticle();
                             if (latestArticle == null) {
                                 getNewArticle();
                             } else {
@@ -261,7 +257,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     savedInstanceState.getString("URL"),
                     savedInstanceState.getString("imageURL"));
             displayArticle(currentArticle);
-            articleScrollView.setVisibility(View.VISIBLE);
             if (mFirebaseAuth.getCurrentUser() != null) {
                 currentUser = (User) savedInstanceState.getSerializable("User");
             }
@@ -293,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void updateUserDatabase(User user) {
-        String userID = user.getID();
+        String userID = user.getId();
         // Update database
         db.collection("Users")
                 .document(userID)
@@ -405,6 +400,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     execute(article.getImageURL());
             browserDirectView(articleImageView, article.getURL());
         }
+        articleScrollView.setVisibility(View.VISIBLE);
         // Scroll to top
         articleScrollView.smoothScrollTo(0, 0);
     }
