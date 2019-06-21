@@ -32,7 +32,7 @@ import java.util.Map;
 
 class FetchData extends AsyncTask<Void, Void, Void> {
     private List<String> categoryFiles = new ArrayList<>(
-            Arrays.asList("science.txt"));
+            Arrays.asList("Arts.txt"));
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private AssetManager assetManager;
 

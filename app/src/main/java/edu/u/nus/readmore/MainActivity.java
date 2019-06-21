@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ScrollView articleScrollView;
     private Button previousArticleBtn, nextArticleBtn;
     private Article currentArticle = null;
-    private final List<String> listOfTopics = Arrays.asList("science");
+    private final List<String> listOfTopics = Arrays.asList("Science");
     private User currentUser = null;
     private boolean changedCurrentUser;
     static MainActivity INSTANCE;
@@ -358,7 +358,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //            int randomIndex = new Random().nextInt(listOfTopics.size());
 //            return listOfTopics.get(randomIndex);
 //        }
-        return "science";
+        return "Arts";
     }
 
     private void generateArticleContent(String pageid) {
