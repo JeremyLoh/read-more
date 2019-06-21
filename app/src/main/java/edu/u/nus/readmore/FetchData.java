@@ -32,7 +32,7 @@ import java.util.Map;
 
 class FetchData extends AsyncTask<Void, Void, Void> {
     private List<String> categoryFiles = new ArrayList<>(
-            Arrays.asList("Arts.txt"));
+            Arrays.asList("History.txt"));
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private AssetManager assetManager;
 
@@ -50,7 +50,7 @@ class FetchData extends AsyncTask<Void, Void, Void> {
                 String categoryName = fileName.substring(0, fileName.length() - 4);
                 if (topicList != null) {
                     // Read and store topics
-                    for (String topic : topicList) {
+                    for (final String topic : topicList) {
                         String data = "";
                         String urlStr = "https://en.wikipedia.org/w/api.php?" +
                                 "action=query&format=json" +
@@ -96,7 +96,7 @@ class FetchData extends AsyncTask<Void, Void, Void> {
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
-                                        Log.v("Complete", "doInBackground");
+                                        Log.v("Complete", "Added " + topic);
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
