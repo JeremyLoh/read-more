@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -145,15 +144,25 @@ public class FilterFragment extends Fragment {
 
     private void changeFilterStatus(Button button, Boolean bool) {
         if (bool) {
-            if (button == artsButton) { artsBool = false; }
-            else if (button == historyButton) { historyBool = false; }
-            else if (button == mathButton) { mathBool = false; }
-            else if (button == scienceButton) { scienceBool = false;}
+            if (button == artsButton) {
+                artsBool = false;
+            } else if (button == historyButton) {
+                historyBool = false;
+            } else if (button == mathButton) {
+                mathBool = false;
+            } else if (button == scienceButton) {
+                scienceBool = false;
+            }
         } else {
-            if (button == artsButton) { artsBool = true; }
-            else if (button == historyButton) { historyBool = true; }
-            else if (button == mathButton) { mathBool = true; }
-            else if (button == scienceButton) { scienceBool = true; }
+            if (button == artsButton) {
+                artsBool = true;
+            } else if (button == historyButton) {
+                historyBool = true;
+            } else if (button == mathButton) {
+                mathBool = true;
+            } else if (button == scienceButton) {
+                scienceBool = true;
+            }
         }
     }
 

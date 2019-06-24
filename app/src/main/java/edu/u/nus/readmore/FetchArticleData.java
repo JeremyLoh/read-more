@@ -1,12 +1,8 @@
 package edu.u.nus.readmore;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.ProgressBar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,7 +17,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 public class FetchArticleData extends AsyncTask<String, Void, Map<String, String>> {
     AsyncArticleResponse articleResponse = null;
