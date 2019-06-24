@@ -1,11 +1,28 @@
 <resources>
-
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <!-- default text color of any given view -->
+        <item name="android:textColor">@color/primaryText</item>
+    </style>
+
+    <style name="MyToolbar" parent="@style/Widget.AppCompat.Toolbar">
+        <item name="android:textColorSecondary">@color/colorPrimaryDark</item>
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:fontFamily">@font/henny_penny_regular</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <!-- Style Action bar -->
+    <style name="TextAppearance.AppCompat.Widget.ActionBar.Title" parent="@android:style/TextAppearance">
+        <item name="android:textColorPrimary">@android:color/holo_red_dark</item>
+        <item name="android:textColorSecondary">@color/colorPrimaryDark</item>
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:fontFamily">@font/henny_penny_regular</item>
+        <item name="android:textSize">20sp</item>
     </style>
 
     <style name="AppTheme.NoActionBar">

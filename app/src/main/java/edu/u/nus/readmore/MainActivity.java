@@ -209,6 +209,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Navigation drawer bar set-up
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        // Remove default app name placement on action bar
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         drawer = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
