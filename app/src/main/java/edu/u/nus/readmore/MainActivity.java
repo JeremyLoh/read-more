@@ -13,7 +13,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,6 +38,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.util.Util;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ScrollView articleScrollView;
     private Button previousArticleBtn, nextArticleBtn;
     private Article currentArticle = null;
-    private final List<String> listOfTopics = Arrays.asList("Science");
+    private final List<String> listOfTopics = Arrays.asList("Science", "Math", "History", "Arts");
     private User currentUser = null;
     private boolean changedCurrentUser;
     static MainActivity INSTANCE;
@@ -346,21 +346,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private String randomTopicGenerator() {
-        // assuming locally instantiated a list of topics sorted alphabetically
-//        if (currentUser != null) {
-//            List<String> userFilteredList = new ArrayList<>();
-//            for (String topic : listOfTopics) {
-//                if (currentUser.getUserFilter().get(topic)) {
-//                    userFilteredList.add(topic);
-//                }
-//            }
-//            int randomIndex = new Random().nextInt(userFilteredList.size());
-//            return userFilteredList.get(randomIndex);
-//        } else {
-//            int randomIndex = new Random().nextInt(listOfTopics.size());
-//            return listOfTopics.get(randomIndex);
-//        }
-        return "Arts";
+        if (currentUser != null) {
+            List<String> userFilteredList = new ArrayList<>();
+            for (String topic : listOfTopics) {
+                if (currentUser.getUserFilter().get(topic)) {
+                    userFilteredList.add(topic);
+                }
+            }
+            int randomIndex = new Random().nextInt(userFilteredList.size());
+            return userFilteredList.get(randomIndex);
+        } else {
+            int randomIndex = new Random().nextInt(listOfTopics.size());
+            return listOfTopics.get(randomIndex);
+        }
     }
 
     private void generateArticleContent(String pageid) {
