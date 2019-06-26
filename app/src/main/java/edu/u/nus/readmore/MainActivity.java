@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,6 +14,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -387,19 +389,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void displayArticle(Article article) {
         articleTitleTextView.setText(article.getTitle());
-        articleContentTextView.setText(article.getDescription());
-        String imageURL = article.getImageURL();
-        if (imageURL.equals("")) {
-            // Hide article image view
-            articleImageView.setVisibility(View.GONE);
+        if (Build.VERSION.SDK_INT >= 24) {
+            articleContentTextView.setText(Html.fromHtml(article.getDescription(), Html.FROM_HTML_MODE_LEGACY));
         } else {
-            // Show article image view
-            articleImageView.setVisibility(View.VISIBLE);
+            // For older SDK
+            articleContentTextView.setText(Html.fromHtml(article.getDescription()));
+        }
+        String imageURL = article.getImageURL();
+        // Show article image view
+        articleImageView.setVisibility(View.VISIBLE);
+        if (imageURL.equals("")) {
+            // Show default app logo
+            articleImageView.setImageResource(R.drawable.read_more_logo);
+            articleImageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        } else {
             // Retrieve image and set to article ImageView
             new DownloadImageTask((ImageView) findViewById(R.id.articleImageView)).
                     execute(article.getImageURL());
-            browserDirectView(articleImageView, article.getURL());
         }
+        browserDirectView(articleImageView, article.getURL());
         articleScrollView.setVisibility(View.VISIBLE);
         // Scroll to top
         articleScrollView.smoothScrollTo(0, 0);
