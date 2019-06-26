@@ -197,6 +197,8 @@ public class LoginFragment extends Fragment {
 
     // Google Account Sign-in
     private void signIn() {
+        // Clear default Google Sign in account
+        mGoogleSignInClient.signOut();
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
