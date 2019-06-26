@@ -26,8 +26,13 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 public class LoginFragment extends Fragment {
     private EditText userID, userPassword;
@@ -39,12 +44,19 @@ public class LoginFragment extends Fragment {
     // flag for changing passwordVisibility
     private boolean passwordFlag = false;
 
+    // Google sign in components
+    private GoogleSignInOptions gso;
+    private GoogleSignInClient mGoogleSignInClient;
+
     // RC_SIGN_IN is the request code you will assign for starting the new activity.
     // this can be any number. When the user is done with the subsequent activity and returns,
     // the system calls your activity's onActivityResult() method.
     private static final int RC_SIGN_IN = 9001;
     private static final String TAG = "GoogleLoginActivity";
+
+    // Firebase components
     private FirebaseAuth mAuth;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -61,6 +73,14 @@ public class LoginFragment extends Fragment {
         loginBtn = getActivity().findViewById(R.id.login_btn);
         googleBtn = getActivity().findViewById(R.id.google_btn);
         mAuth = FirebaseAuth.getInstance();
+        // original code
+        gso = new GoogleSignInOptions
+                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        // Build a GoogleSignInClient with the options specified by gso.
+        mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
 
         //setting login button activity
         loginBtn.setOnClickListener(new View.OnClickListener() {
@@ -123,12 +143,7 @@ public class LoginFragment extends Fragment {
         googleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switch (v.getId()) {
-                    case R.id.google_btn:
-                        signIn();
-                        break;
-                    // ...
-                }
+                signIn();
             }
         });
     }
@@ -184,13 +199,6 @@ public class LoginFragment extends Fragment {
     private void signIn() {
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-        GoogleSignInOptions gso = new GoogleSignInOptions
-                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-        // Build a GoogleSignInClient with the options specified by gso.
-        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
-
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
@@ -204,39 +212,65 @@ public class LoginFragment extends Fragment {
             // The Task returned from this call is always completed, no need to attach
             // a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
+            try {
+                // Google Sign In was successful, authenticate with Firebase
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                firebaseAuthWithGoogle(account);
+            } catch (ApiException e) {
+                // Google Sign In failed, update UI appropriately
+                Log.w(TAG, "Google sign in failed", e);
+                updateUI(null);
+            }
         }
     }
 
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-
-            // Signed in successfully, show authenticated UI.
-            updateUI(account);
-        } catch (ApiException e) {
-            // The ApiException status code indicates the detailed failure reason.
-            // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
-            updateUI(null);
-        }
+    private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
+        Log.d(TAG, "firebaseAuthWithGoogle: " + account.getId());
+        // Check user last logged inbefore? if frst time create a User document in database
+        // else success login redirect back to homepage by doing finish()
+        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "signInWithCredential:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            // check user new or existing
+                            boolean isNewUser = task.getResult().getAdditionalUserInfo().isNewUser();
+                            // Create a User class and add user info into FireStore db
+                            if (isNewUser) {
+                                String ID = user.getUid();
+                                User newUser = new User(ID);
+                                db.collection("Users")
+                                        .document(ID)
+                                        .set(newUser, SetOptions.merge());
+                            }
+                            updateUI(user);
+                        } else {
+                            // Sign-in fails, display a message to the user.
+                            Log.d(TAG, "signInWithCredential:failure", task.getException());
+                            updateUI(null);
+                        }
+                    }
+                });
     }
 
-    private void updateUI(GoogleSignInAccount account) {
+    private void updateUI(FirebaseUser account) {
         if (account == null) {
-            // load default UI
-            // TEMP SET TO LOGIN PAGE
-            Intent loadLoginPage = new Intent(getActivity().getApplicationContext(),
-                    IntermediateActivity.class);
-            loadLoginPage.putExtra(getString(R.string.login_key), "login");
-            startActivity(loadLoginPage);
+            Toast
+                    .makeText(getActivity(),
+                            "Authentication failed, please try again",
+                            Toast.LENGTH_SHORT)
+                    .show();
         } else {
-            // load google sign-in UI
-            // TEMP SET TO LOGIN PAGE
-            Intent loadLoginPage = new Intent(getActivity().getApplicationContext(),
-                    IntermediateActivity.class);
-            loadLoginPage.putExtra(getString(R.string.login_key), "login");
-            startActivity(loadLoginPage);
+            Toast
+                    .makeText(getActivity().getApplicationContext(),
+                            "Login Successful!",
+                            Toast.LENGTH_SHORT)
+                    .show();
+            // Finishes intermediate, redirect to MainActivity
+            getActivity().finish();
         }
     }
 
