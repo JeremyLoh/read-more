@@ -73,7 +73,7 @@ public class LoginFragment extends Fragment {
         loginBtn = getActivity().findViewById(R.id.login_btn);
         googleBtn = getActivity().findViewById(R.id.google_btn);
         mAuth = FirebaseAuth.getInstance();
-        // original code
+
         gso = new GoogleSignInOptions
                 .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
