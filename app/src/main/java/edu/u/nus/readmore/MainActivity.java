@@ -70,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private boolean changedCurrentUser;
     static MainActivity INSTANCE;
 
+    // Testing
+    private static int counter = 0;
 
     // onCreateOptionsMenu is called once
     @Override
@@ -110,9 +112,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void logout() {
         if (changedCurrentUser) {
-            updateUserDatabase(currentUser);
+            String userID = currentUser.getId();
+            // Update database
+            db.collection("Users")
+                    .document(userID)
+                    .set(currentUser)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            mFirebaseAuth.signOut();
+                        }
+                    });
+            changedCurrentUser = false;
+        } else {
+            mFirebaseAuth.signOut();
         }
-        mFirebaseAuth.signOut();
         Toast
                 .makeText(this,
                         "You have successfully signed out",
@@ -321,8 +335,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Query subTopic;
         if (new Random().nextInt(2) == 1) {
             subTopic = topicRef.whereGreaterThan("ID", checker).limit(1);
+            counter++;
         } else {
             subTopic = topicRef.whereLessThanOrEqualTo("ID", checker).limit(1);
+            counter++;
         }
         subTopic.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override

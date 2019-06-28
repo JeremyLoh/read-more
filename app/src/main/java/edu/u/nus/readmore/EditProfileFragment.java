@@ -84,6 +84,9 @@ public class EditProfileFragment extends Fragment {
                                                             @Override
                                                             public void onSuccess(Void aVoid) {
                                                                 user.delete();
+                                                                Toast.makeText(getActivity().getApplicationContext(),
+                                                                        "You have successfully deleted your account",
+                                                                        Toast.LENGTH_LONG).show();
                                                                 // Redirect to MainActivity
                                                                 getActivity().finish();
                                                             }
