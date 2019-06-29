@@ -9,11 +9,19 @@
         <item name="android:textColor">@color/primaryText</item>
     </style>
 
-    <style name="MyToolbar" parent="@style/Widget.AppCompat.Toolbar">
-        <item name="android:textColorSecondary">@color/colorPrimaryDark</item>
+    <style name="MyToolbar" parent="@style/Widget.AppCompat.ActionBar">
+        <item name="android:textColor">@color/primaryText</item>
+        <!-- icon color is set by textColorSecondary -->
+        <item name="android:textColorSecondary">@color/primaryText</item>
         <item name="android:background">@color/colorPrimary</item>
         <item name="android:fontFamily">@font/henny_penny_regular</item>
         <item name="android:textSize">20sp</item>
+        <item name="popupTheme">@style/PopupMenuTheme</item>
+    </style>
+
+    <style name="PopupMenuTheme" parent="@android:style/Widget.PopupMenu">
+        <item name="android:background">@color/colorAccent</item>
+        <item name="android:textColor">@android:color/white</item>
     </style>
 
     <!-- Style Action bar -->

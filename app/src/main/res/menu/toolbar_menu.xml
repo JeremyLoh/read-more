@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <item
+        android:id="@+id/toolbar_share_item"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="end"
+        android:layout_marginEnd="16dp"
+        android:background="?android:selectableItemBackground"
+        android:icon="@drawable/ic_share_icon_24dp"
+        android:title="Share"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/logout_item"
+        android:title="Logout"
+        android:visible="false"
+        app:showAsAction="never" />
+</menu>

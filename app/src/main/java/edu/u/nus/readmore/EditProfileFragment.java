@@ -59,6 +59,12 @@ public class EditProfileFragment extends Fragment {
                         .setMessage("Once you delete your account, there is no going back. Please be certain.")
                         .setCancelable(true);
 
+                final Toast removedAccount = makeToastMessage("You have successfully deleted your account",
+                        Toast.LENGTH_LONG);
+                final Toast authFailed = makeToastMessage("Authentication failed. Please " +
+                                "retype your password.",
+                        Toast.LENGTH_LONG);
+
                 if (loginType.equals(EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD)) {
                     final EditText passwordField = makePasswordEditText();
                     confirmDialog.setView(passwordField);
@@ -84,9 +90,7 @@ public class EditProfileFragment extends Fragment {
                                                             @Override
                                                             public void onSuccess(Void aVoid) {
                                                                 user.delete();
-                                                                Toast.makeText(getActivity().getApplicationContext(),
-                                                                        "You have successfully deleted your account",
-                                                                        Toast.LENGTH_LONG).show();
+                                                                removedAccount.show();
                                                                 // Redirect to MainActivity
                                                                 getActivity().finish();
                                                             }
@@ -97,19 +101,12 @@ public class EditProfileFragment extends Fragment {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
                                                 passwordField.setText("");
-                                                Toast.makeText(getActivity().getApplicationContext(),
-                                                        "Authentication failed. " +
-                                                                "Please retype your password.",
-                                                        Toast.LENGTH_LONG)
-                                                        .show();
+                                                authFailed.show();
                                             }
                                         });
                             } else {
                                 // Empty password field
-                                Toast.makeText(getActivity().getApplicationContext(),
-                                        "Please type your password.",
-                                        Toast.LENGTH_LONG)
-                                        .show();
+                                authFailed.show();
                             }
                         }
                     });
@@ -138,6 +135,7 @@ public class EditProfileFragment extends Fragment {
                                                             @Override
                                                             public void onSuccess(Void aVoid) {
                                                                 user.delete();
+                                                                removedAccount.show();
                                                                 // Redirect to MainActivity
                                                                 getActivity().finish();
                                                             }
@@ -147,11 +145,7 @@ public class EditProfileFragment extends Fragment {
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
-                                                Toast.makeText(getActivity().getApplicationContext(),
-                                                        "Authentication failed. " +
-                                                                "Unable to delete account.",
-                                                        Toast.LENGTH_LONG)
-                                                        .show();
+                                                authFailed.show();
                                             }
                                         });
                             }
@@ -162,6 +156,12 @@ public class EditProfileFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private Toast makeToastMessage(String message, int toastLength) {
+        return Toast.makeText(getActivity().getApplicationContext(),
+                message,
+                toastLength);
     }
 
     private EditText makePasswordEditText() {

@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
@@ -62,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView navigationView;
     private TextView articleContentTextView, articleTitleTextView;
     private ImageView articleImageView;
+    private ImageButton toolbarShareBtn;
     private ScrollView articleScrollView;
     private Button previousArticleBtn, nextArticleBtn;
     private Article currentArticle = null;
@@ -76,8 +78,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     // onCreateOptionsMenu is called once
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Initialize logout_menu xml file (android:visible="false" at start)
-        getMenuInflater().inflate(R.menu.logout_menu, menu);
+        // Initialize toolbar_menu xml file (android:visible="false" at start)
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         optionsMenu = menu;
         logoutItem = optionsMenu.findItem(R.id.logout_item);
         if (isLoggedIn) {
@@ -105,6 +107,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         })
                         .setNegativeButton("No", null)
                         .show();
+                break;
+            case R.id.toolbar_share_item:
+                Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+                String shareTitle = currentArticle.getTitle();
+                String shareBody = currentArticle.getURL();
+                sharingIntent.putExtra(Intent.EXTRA_SUBJECT, shareTitle);
+                sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(sharingIntent, "Share Using"));
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -147,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fd.execute();
         }
 
-        // Initialise article components
+        // Initialise article and toolbar components
         articleTitleTextView = findViewById(R.id.articleTitleTextView);
         articleContentTextView = findViewById(R.id.articleContentTextView);
         articleImageView = findViewById(R.id.articleImageView);
