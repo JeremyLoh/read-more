@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OnBoardScreenActivity extends AppCompatActivity {
-
     private ViewPager screenPager;
     private TabLayout tabIndicator;
     private OnBoardScreenPagerAdapter onBoardScreenPagerAdapter;
@@ -45,7 +44,7 @@ public class OnBoardScreenActivity extends AppCompatActivity {
             finish();
         }
 
-        setContentView(R.layout.activity_onboarscreen);
+        setContentView(R.layout.activity_onboardscreen);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
         // List of Screen items to be displayed
 
