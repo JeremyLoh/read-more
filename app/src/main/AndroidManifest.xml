@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-
     package="edu.u.nus.readmore">
 
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
@@ -14,8 +13,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".IntermediateActivity"
-            android:theme="@style/AppTheme">
-
+            android:theme="@style/AppTheme"
+            android:screenOrientation="sensor">
         </activity>
         <activity
             android:name=".MainActivity"
