@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Intent sharingIntent = new Intent(Intent.ACTION_SEND);
                 sharingIntent.setType("text/plain");
                 String shareTitle = currentArticle.getTitle();
-                String shareBody = currentArticle.getURL();
+                String shareBody = currentArticle.getUrl();
                 sharingIntent.putExtra(Intent.EXTRA_SUBJECT, shareTitle);
                 sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
                 startActivity(Intent.createChooser(sharingIntent, "Share Using"));
@@ -434,7 +434,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             new DownloadImageTask((ImageView) findViewById(R.id.articleImageView)).
                     execute(article.getImageURL());
         }
-        browserDirectView(articleImageView, article.getURL());
+        browserDirectView(articleImageView, article.getUrl());
         articleScrollView.setVisibility(View.VISIBLE);
         // Scroll to top
         articleScrollView.smoothScrollTo(0, 0);
@@ -607,7 +607,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         outState.putString("title", currentArticle.getTitle());
         outState.putString("description", currentArticle.getDescription());
         outState.putString("pageid", currentArticle.getPageid());
-        outState.putString("URL", currentArticle.getURL());
+        outState.putString("URL", currentArticle.getUrl());
         outState.putString("imageURL", currentArticle.getImageURL());
 
         // For rotating screen plus changing user filter

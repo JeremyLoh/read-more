@@ -6,18 +6,18 @@ class Article implements Serializable {
     private String title;
     private String description;
     private String pageid;
-    private String URL;
+    private String url;
     private String imageURL;
 
     public Article() {
         // public no-arg constructor needed
     }
 
-    public Article(String title, String description, String pageid, String URL, String imageURL) {
+    public Article(String title, String description, String pageid, String url, String imageURL) {
         this.title = title;
         this.description = description;
         this.pageid = pageid;
-        this.URL = URL;
+        this.url = url;
         this.imageURL = imageURL;
     }
 
@@ -33,9 +33,7 @@ class Article implements Serializable {
         return pageid;
     }
 
-    public String getURL() {
-        return URL;
-    }
+    public String getUrl() { return url; }
 
     public String getImageURL() {
         return imageURL;
@@ -48,7 +46,7 @@ class Article implements Serializable {
         result = prime * result + ((title == null) ? 0 : title.hashCode());
         result = prime * result + ((description == null) ? 0 : description.hashCode());
         result = prime * result + ((pageid == null) ? 0 : pageid.hashCode());
-        result = prime * result + ((URL == null) ? 0 : URL.hashCode());
+        result = prime * result + ((url == null) ? 0 : url.hashCode());
         result = prime * result + ((imageURL == null) ? 0 : imageURL.hashCode());
         return result;
     }
