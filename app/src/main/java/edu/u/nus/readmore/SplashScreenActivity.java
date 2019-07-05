@@ -1,6 +1,7 @@
 package edu.u.nus.readmore;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,9 +22,9 @@ public class SplashScreenActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent mainActivityIntent =
-                        new Intent(SplashScreenActivity.this, MainActivity.class);
-                startActivity(mainActivityIntent);
+                Intent boardScreenIntent =
+                        new Intent(SplashScreenActivity.this, OnBoardScreenActivity.class);
+                startActivity(boardScreenIntent);
                 finish();
             }
         }, SPLASH_SCREEN_TIMEOUT);
