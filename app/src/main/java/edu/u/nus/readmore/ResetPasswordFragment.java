@@ -47,11 +47,8 @@ public class ResetPasswordFragment extends Fragment {
                                                 "Reset link have been sent to your e-mail",
                                                 Toast.LENGTH_LONG)
                                                 .show();
-                                        getActivity()
-                                                .getSupportFragmentManager()
-                                                .beginTransaction()
-                                                .replace(R.id.intermediate_frame_layout, new LoginFragment())
-                                                .commit();
+                                        // Go to previous fragment
+                                        getActivity().getSupportFragmentManager().popBackStack();
                                     } else {
                                         makeToastMessage("Unable to send reset password email",
                                                 Toast.LENGTH_LONG, 0, -80);

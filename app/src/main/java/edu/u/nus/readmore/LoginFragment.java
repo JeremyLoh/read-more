@@ -90,14 +90,16 @@ public class LoginFragment extends Fragment {
             }
         });
 
+        final FragmentTransaction toRegFt = getActivity()
+                .getSupportFragmentManager()
+                .beginTransaction();
+
         //setting sign-up button to RegisterFragment
         signUpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentTransaction toRegFt = getActivity()
-                        .getSupportFragmentManager()
-                        .beginTransaction();
                 toRegFt.replace(R.id.intermediate_frame_layout, new RegisterFragment());
+                toRegFt.addToBackStack("Register");
                 toRegFt.commit();
             }
         });
@@ -106,10 +108,8 @@ public class LoginFragment extends Fragment {
         forgotPW.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentTransaction toRegFt = getActivity()
-                        .getSupportFragmentManager()
-                        .beginTransaction();
                 toRegFt.replace(R.id.intermediate_frame_layout, new ResetPasswordFragment());
+                toRegFt.addToBackStack("ForgotPW");
                 toRegFt.commit();
             }
         });
@@ -276,11 +276,9 @@ public class LoginFragment extends Fragment {
         }
     }
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_login, container, false);
-
     }
 }

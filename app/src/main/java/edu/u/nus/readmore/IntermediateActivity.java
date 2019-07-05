@@ -3,6 +3,7 @@ package edu.u.nus.readmore;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -122,14 +123,20 @@ public class IntermediateActivity extends AppCompatActivity {
                     .setCancelable(true)
                     .show();
         } else {
-            finish();
+            onBackPressed();
         }
         return true;
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        FragmentManager fm = getSupportFragmentManager();
+        if (fm.getBackStackEntryCount() > 1) {
+            // if there are more than 1 fragment
+            fm.popBackStack();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     public void updateUserFilterAtInter(Map<String, Boolean> updatedUserFilter) {
