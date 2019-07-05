@@ -10,8 +10,10 @@ import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -33,12 +35,14 @@ public class EditProfileFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private ProgressBar mProgressBar;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         mAuth = FirebaseAuth.getInstance();
+        mProgressBar = getActivity().findViewById(R.id.delete_progress);
 
         // Initialize buttons
         deleteAccountBtn = getActivity().findViewById(R.id.delete_account_btn);
@@ -46,6 +50,10 @@ public class EditProfileFragment extends Fragment {
         deleteAccountBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mProgressBar.setVisibility(View.VISIBLE);
+                // disable touch until progress finish
+                getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                 final FirebaseUser user = mAuth.getCurrentUser();
                 final String userID = user.getUid();
                 // Get sign in method,
@@ -82,6 +90,7 @@ public class EditProfileFragment extends Fragment {
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
+                                                // enable touch and dismiss progressbar
                                                 // Delete user data in firestore
                                                 db.collection("Users")
                                                         .document(userID)
@@ -89,6 +98,7 @@ public class EditProfileFragment extends Fragment {
                                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                             @Override
                                                             public void onSuccess(Void aVoid) {
+                                                                dismissProgressBar();
                                                                 user.delete();
                                                                 removedAccount.show();
                                                                 // Redirect to MainActivity
@@ -100,11 +110,15 @@ public class EditProfileFragment extends Fragment {
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
+                                                // enable touch and dismiss progressbar
+                                                dismissProgressBar();
                                                 passwordField.setText("");
                                                 authFailed.show();
                                             }
                                         });
                             } else {
+                                // enable touch and dismiss progressbar
+                                dismissProgressBar();
                                 // Empty password field
                                 authFailed.show();
                             }
@@ -134,6 +148,7 @@ public class EditProfileFragment extends Fragment {
                                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                             @Override
                                                             public void onSuccess(Void aVoid) {
+                                                                dismissProgressBar();
                                                                 user.delete();
                                                                 removedAccount.show();
                                                                 // Redirect to MainActivity
@@ -145,6 +160,7 @@ public class EditProfileFragment extends Fragment {
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
+                                                dismissProgressBar();
                                                 authFailed.show();
                                             }
                                         });
@@ -178,6 +194,11 @@ public class EditProfileFragment extends Fragment {
         passwordField.setInputType(InputType.TYPE_CLASS_TEXT |
                 InputType.TYPE_TEXT_VARIATION_PASSWORD);
         return passwordField;
+    }
+
+    private void dismissProgressBar() {
+        mProgressBar.setVisibility(View.GONE);
+        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
 
     @Nullable

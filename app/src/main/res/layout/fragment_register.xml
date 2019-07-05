@@ -35,11 +35,12 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/linearLayout1"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp  "
+        android:layout_marginTop="20dp"
         android:orientation="vertical">
 
         <Button
@@ -57,5 +58,13 @@
             android:text="Already a member? Login here" />
     </LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/register_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linearLayout2"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="16dp"
+        android:visibility="gone" />
 
 </RelativeLayout>
