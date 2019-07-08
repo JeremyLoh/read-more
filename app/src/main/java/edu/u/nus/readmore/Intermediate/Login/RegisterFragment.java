@@ -121,8 +121,8 @@ public class RegisterFragment extends Fragment {
     private void registerNewUser() {
         if (validateForm()) {
             // Create a new user account
-            final String givenEmail = textInputEmail.getEditText().toString();
-            String givenPassword = textInputPassword.getEditText().toString();
+            final String givenEmail = textInputEmail.getEditText().getText().toString();
+            String givenPassword = textInputPassword.getEditText().getText().toString();
 
             mAuth.createUserWithEmailAndPassword(givenEmail, givenPassword)
                     .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
