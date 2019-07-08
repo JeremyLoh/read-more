@@ -1,5 +1,7 @@
 package edu.u.nus.readmore;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,8 +11,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +34,7 @@ public class RegisterFragment extends Fragment {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static final String TAG = "EmailPassword";
+    private ProgressBar mProgressBar;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,11 +54,17 @@ public class RegisterFragment extends Fragment {
         email = getActivity().findViewById(R.id.register_id);
         password = getActivity().findViewById(R.id.register_pwd);
         confirmPassword = getActivity().findViewById(R.id.register_pwd_check);
+        mProgressBar = getActivity().findViewById(R.id.register_progress);
 
         // create account and redirecting back to login fragment
         createAccBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mProgressBar.setVisibility(View.VISIBLE);
+                // disable touch until progress finish
+                getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                hideKeyBoardFrom(getActivity().getApplicationContext(), getView().getRootView());
                 registerNewUser();
             }
         });
@@ -60,6 +72,7 @@ public class RegisterFragment extends Fragment {
         alreadyMember.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideKeyBoardFrom(getActivity().getApplicationContext(), getView().getRootView());
                 backToLogin();
             }
         });
@@ -132,6 +145,7 @@ public class RegisterFragment extends Fragment {
                                         .set(newUser, SetOptions.merge());
 
                                 updateUI(user);
+                                dismissProgressBar();
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -140,9 +154,13 @@ public class RegisterFragment extends Fragment {
                                         Toast.LENGTH_SHORT)
                                         .show();
                                 updateUI(null);
+                                dismissProgressBar();
                             }
                         }
                     });
+        } else {
+            // failed input
+            dismissProgressBar();
         }
     }
 
@@ -160,6 +178,17 @@ public class RegisterFragment extends Fragment {
     // direct back to login page, previous fragment
     private void backToLogin() {
         getActivity().getSupportFragmentManager().popBackStack();
+    }
+
+    // hide soft keyboard
+    private void hideKeyBoardFrom(Context context, View view) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    private void dismissProgressBar() {
+        mProgressBar.setVisibility(View.GONE);
+        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
 
     @Nullable

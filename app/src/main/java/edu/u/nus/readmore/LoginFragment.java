@@ -1,5 +1,7 @@
 package edu.u.nus.readmore;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,9 +14,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +45,7 @@ public class LoginFragment extends Fragment {
     private ImageButton passwordVisibilityBtn;
     private Button signUpBtn, loginBtn;
     private SignInButton googleBtn;
+    private ProgressBar mProgressBar;
 
     // flag for changing passwordVisibility
     private boolean passwordFlag = false;
@@ -73,6 +79,7 @@ public class LoginFragment extends Fragment {
         loginBtn = getActivity().findViewById(R.id.login_btn);
         googleBtn = getActivity().findViewById(R.id.google_btn);
         mAuth = FirebaseAuth.getInstance();
+        mProgressBar = getActivity().findViewById(R.id.login_progress);
 
         gso = new GoogleSignInOptions
                 .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -86,6 +93,13 @@ public class LoginFragment extends Fragment {
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Disable clicking upon login prevent crashing of app, will enable upon
+                // log in successfully or failure
+                mProgressBar.setVisibility(View.VISIBLE);
+                getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                // hide soft keyboard for better UI
+                hideKeyBoardFrom(getActivity().getApplicationContext(), getView().getRootView());
                 loginUser();
             }
         });
@@ -98,6 +112,7 @@ public class LoginFragment extends Fragment {
         signUpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideKeyBoardFrom(getActivity().getApplicationContext(), getView().getRootView());
                 toRegFt.replace(R.id.intermediate_frame_layout, new RegisterFragment());
                 toRegFt.addToBackStack("Register");
                 toRegFt.commit();
@@ -108,6 +123,7 @@ public class LoginFragment extends Fragment {
         forgotPW.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideKeyBoardFrom(getActivity().getApplicationContext(), getView().getRootView());
                 toRegFt.replace(R.id.intermediate_frame_layout, new ResetPasswordFragment());
                 toRegFt.addToBackStack("ForgotPW");
                 toRegFt.commit();
@@ -143,9 +159,15 @@ public class LoginFragment extends Fragment {
         googleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideKeyBoardFrom(getActivity().getApplicationContext(), getView().getRootView());
                 signIn();
             }
         });
+    }
+
+    private void hideKeyBoardFrom(Context context, View view) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     // Method for logging in Users
@@ -181,18 +203,28 @@ public class LoginFragment extends Fragment {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
+                                dismissProgressBar();
                                 Toast.makeText(getActivity().getApplicationContext(),
                                         "Login Successful!",
                                         Toast.LENGTH_SHORT).show();
                                 getActivity().finish();
                             } else {
+                                dismissProgressBar();
                                 Toast.makeText(getActivity().getApplicationContext(),
                                         "Login unsuccessful, please try again",
                                         Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
+        } else {
+            // failed input
+            dismissProgressBar();
         }
+    }
+
+    private void dismissProgressBar() {
+        mProgressBar.setVisibility(View.GONE);
+        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
 
     // Google Account Sign-in

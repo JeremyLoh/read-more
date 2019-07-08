@@ -1,5 +1,7 @@
 package edu.u.nus.readmore;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,8 +11,11 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -18,8 +23,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class ResetPasswordFragment extends Fragment {
-    Button resetPwBtn;
-    EditText userEmailEditText;
+    private Button resetPwBtn;
+    private EditText userEmailEditText;
+    private ProgressBar mProgressBar;
 
     private FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
 
@@ -30,10 +36,16 @@ public class ResetPasswordFragment extends Fragment {
         getActivity().setTitle("Reset Password");
         resetPwBtn = getActivity().findViewById(R.id.reset_pw_btn);
         userEmailEditText = getActivity().findViewById(R.id.user_email_text);
+        mProgressBar = getActivity().findViewById(R.id.reset_progress);
 
         resetPwBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mProgressBar.setVisibility(View.VISIBLE);
+                // disable touch until progress finish
+                getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                hideKeyBoardFrom(getActivity().getApplicationContext(), getView().getRootView());
                 // Verify email format
                 String email = userEmailEditText.getText().toString();
                 if (validEmailFormat(email)) {
@@ -43,6 +55,7 @@ public class ResetPasswordFragment extends Fragment {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
+                                        dismissProgressBar();
                                         Toast.makeText(getActivity().getApplicationContext(),
                                                 "Reset link have been sent to your e-mail",
                                                 Toast.LENGTH_LONG)
@@ -50,11 +63,15 @@ public class ResetPasswordFragment extends Fragment {
                                         // Go to previous fragment
                                         getActivity().getSupportFragmentManager().popBackStack();
                                     } else {
+                                        dismissProgressBar();
                                         makeToastMessage("Unable to send reset password email",
                                                 Toast.LENGTH_LONG, 0, -80);
                                     }
                                 }
                             });
+                } else {
+                    // failed reset, added else to make it look better
+                    dismissProgressBar();
                 }
             }
         });
@@ -76,6 +93,16 @@ public class ResetPasswordFragment extends Fragment {
                 toastLength);
         toast.setGravity(Gravity.CENTER, xOffset, yOffset);
         toast.show();
+    }
+
+    private void hideKeyBoardFrom(Context context, View view) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    private void dismissProgressBar() {
+        mProgressBar.setVisibility(View.GONE);
+        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
 
     @Nullable
