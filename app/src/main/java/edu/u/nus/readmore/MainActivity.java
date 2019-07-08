@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseAuth.AuthStateListener mFirebaseAuthStateListener;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private NavigationView navigationView;
-    private TextView articleContentTextView, articleTitleTextView;
+    private TextView articleContentTextView, articleTitleTextView, navHeaderUserEmail;
     private ImageView articleImageView;
     private ImageButton toolbarShareBtn;
     private ScrollView articleScrollView;
@@ -159,6 +159,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             UpdateDbTopics fd = new UpdateDbTopics(getApplicationContext());
             fd.execute();
         }
+        // Navigation drawer bar set-up
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        // Remove default app name placement on action bar
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        drawer = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
 
         // Initialise article and toolbar components
         articleTitleTextView = findViewById(R.id.articleTitleTextView);
@@ -168,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         nextArticleBtn = findViewById(R.id.nextArticleBtn);
         articleScrollView = findViewById(R.id.articleScrollView);
         progressBar = findViewById(R.id.progressBar);
+        navHeaderUserEmail = navigationView.getHeaderView(0).findViewById(R.id.nav_user_email);
 
         // Initialise Firebase components
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -182,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     navigationView.inflateMenu(R.menu.drawer_menu_user);
                     isLoggedIn = true;
                     previousArticleBtn.setVisibility(View.VISIBLE);
+                    navHeaderUserEmail.setText(user.getEmail());
                     if (currentUser == null) {
                         setCurrentUser();
                     }
@@ -189,6 +203,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     // user is signed out
                     navigationView.getMenu().clear();
                     navigationView.inflateMenu(R.menu.drawer_menu_login);
+                    navHeaderUserEmail.setText(R.string.nav_header_guest);
                     isLoggedIn = false;
                     previousArticleBtn.setVisibility(View.GONE);
                     currentUser = null;
@@ -234,19 +249,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 displayArticle(currentArticle);
             }
         });
-
-        // Navigation drawer bar set-up
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        // Remove default app name placement on action bar
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        drawer = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
-                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
 
         // Checking current display have any article,
         // if article present display back same article,

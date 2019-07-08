@@ -10,6 +10,7 @@
     <string name="login_key">Login</string>
     <string name="settings_key">Settings</string>
     <string name="filter_key">Filter</string>
+    <string name="nav_header_guest">Guest</string>
     <!-- Filter fragment-->
     <string name="arts">Arts</string>
     <string name="history">History</string>
@@ -18,4 +19,8 @@
     <string name="edit_profile_key">Edit Profile</string>
     <!-- Values for edit profile fragment -->
     <string name="delete_account_text">Delete Account</string>
+    <!-- common use strings-->
+    <string name="email_string">Email</string>
+    <string name="password_string">Password</string>
+
 </resources>
