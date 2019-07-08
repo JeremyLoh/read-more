@@ -472,11 +472,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     startIntermediateActivity(settingsKey, settingsValue);
                 }
                 break;
-            case R.id.edit_profile:
+            case R.id.nav_edit_profile:
                 String editProfileKey = "Edit Profile";
-                startInterActHashMap(editProfileKey);
+                String editProfileValue = "Edit Profile";
+                startIntermediateActivity(editProfileKey, editProfileValue);
                 break;
-            case R.id.log_out:
+            case R.id.nav_filter:
+                String filterKey = "Filter";
+                startInterActHashMap(filterKey);
+                break;
+            case R.id.nav_read_history:
+                String readHistoryKey = getString(R.string.read_history_key);
+                Intent startIntent = new Intent(getApplicationContext(), IntermediateActivity.class);
+                startIntent.putExtra(readHistoryKey, currentUser);
+                startActivity(startIntent);
+                break;
+            case R.id.nav_log_out:
                 new AlertDialog.Builder(this)
                         .setTitle("Logout")
                         .setMessage("Do you want to logout?")
@@ -489,10 +500,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         })
                         .setNegativeButton("No", null)
                         .show();
-                break;
-            case R.id.filter:
-                String filterKey = "Filter";
-                startInterActHashMap(filterKey);
                 break;
         }
         drawer.closeDrawer(GravityCompat.START);
