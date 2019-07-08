@@ -2,7 +2,7 @@ package edu.u.nus.readmore;
 
 import java.io.Serializable;
 
-class Article implements Serializable {
+public class Article implements Serializable {
     private String title;
     private String description;
     private String pageid;

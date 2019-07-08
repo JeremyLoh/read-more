@@ -1,4 +1,4 @@
-package edu.u.nus.readmore;
+package edu.u.nus.readmore.Intermediate.Login;
 
 import android.app.Activity;
 import android.content.Context;
@@ -26,6 +26,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+
+import edu.u.nus.readmore.R;
+import edu.u.nus.readmore.User;
 
 public class RegisterFragment extends Fragment {
     private TextView alreadyMember;

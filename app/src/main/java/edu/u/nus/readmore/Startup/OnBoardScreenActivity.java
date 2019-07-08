@@ -1,4 +1,4 @@
-package edu.u.nus.readmore;
+package edu.u.nus.readmore.Startup;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,6 +18,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import edu.u.nus.readmore.MainActivity;
+import edu.u.nus.readmore.R;
 
 public class OnBoardScreenActivity extends AppCompatActivity {
     private ViewPager screenPager;

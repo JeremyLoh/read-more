@@ -48,6 +48,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import edu.u.nus.readmore.Intermediate.IntermediateActivity;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         AsyncArticleResponse {
     private boolean TESTING_DB = false;
@@ -154,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         INSTANCE = this;
 
         if (TESTING_DB) {
-            FetchData fd = new FetchData(getApplicationContext());
+            UpdateDbTopics fd = new UpdateDbTopics(getApplicationContext());
             fd.execute();
         }
 

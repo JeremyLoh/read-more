@@ -1,4 +1,4 @@
-package edu.u.nus.readmore;
+package edu.u.nus.readmore.Intermediate;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,6 +13,9 @@ import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import edu.u.nus.readmore.Intermediate.IntermediateActivity;
+import edu.u.nus.readmore.R;
 
 public class FilterFragment extends Fragment {
     Button artsButton, historyButton, mathButton, scienceButton, saveButton;

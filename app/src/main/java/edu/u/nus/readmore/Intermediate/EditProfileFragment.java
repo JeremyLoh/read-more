@@ -1,4 +1,4 @@
-package edu.u.nus.readmore;
+package edu.u.nus.readmore.Intermediate;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -29,6 +29,8 @@ import com.google.firebase.auth.UserInfo;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
+
+import edu.u.nus.readmore.R;
 
 public class EditProfileFragment extends Fragment {
     private Button deleteAccountBtn;

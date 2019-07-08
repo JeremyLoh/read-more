@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class User implements Serializable {
+public class User implements Serializable {
     private String id;
     // readList has a maximum size of 1000
     private final int READLIST_LIMIT = 1000;

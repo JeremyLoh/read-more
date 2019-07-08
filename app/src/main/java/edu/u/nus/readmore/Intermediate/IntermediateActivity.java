@@ -1,4 +1,4 @@
-package edu.u.nus.readmore;
+package edu.u.nus.readmore.Intermediate;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,6 +13,10 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import edu.u.nus.readmore.Intermediate.Login.LoginFragment;
+import edu.u.nus.readmore.MainActivity;
+import edu.u.nus.readmore.R;
 
 public class IntermediateActivity extends AppCompatActivity {
     private FirebaseAuth mFirebaseAuth;

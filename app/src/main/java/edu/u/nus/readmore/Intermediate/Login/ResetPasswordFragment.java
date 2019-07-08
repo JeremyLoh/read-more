@@ -1,4 +1,4 @@
-package edu.u.nus.readmore;
+package edu.u.nus.readmore.Intermediate.Login;
 
 import android.app.Activity;
 import android.content.Context;
@@ -21,6 +21,8 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+
+import edu.u.nus.readmore.R;
 
 public class ResetPasswordFragment extends Fragment {
     private Button resetPwBtn;

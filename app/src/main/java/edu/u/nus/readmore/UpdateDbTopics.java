@@ -30,13 +30,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class FetchData extends AsyncTask<Void, Void, Void> {
+class UpdateDbTopics extends AsyncTask<Void, Void, Void> {
     private List<String> categoryFiles = new ArrayList<>(
             Arrays.asList("History.txt"));
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private AssetManager assetManager;
 
-    public FetchData(Context context) {
+    public UpdateDbTopics(Context context) {
         assetManager = context.getAssets();
     }
 
