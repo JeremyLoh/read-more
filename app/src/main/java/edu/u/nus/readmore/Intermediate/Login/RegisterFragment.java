@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -33,7 +34,7 @@ import edu.u.nus.readmore.User;
 public class RegisterFragment extends Fragment {
     private TextView alreadyMember;
     private Button createAccBtn;
-    private EditText email, password, confirmPassword;
+    private TextInputLayout textInputEmail, textInputPassword, textInputConfirmPassword;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static final String TAG = "EmailPassword";
@@ -54,9 +55,9 @@ public class RegisterFragment extends Fragment {
         // instantiate buttons and textview
         alreadyMember = getActivity().findViewById(R.id.already_member);
         createAccBtn = getActivity().findViewById(R.id.register_btn);
-        email = getActivity().findViewById(R.id.register_id);
-        password = getActivity().findViewById(R.id.register_pwd);
-        confirmPassword = getActivity().findViewById(R.id.register_pwd_check);
+        textInputEmail = getActivity().findViewById(R.id.text_input_email);
+        textInputPassword = getActivity().findViewById(R.id.text_input_password);
+        textInputConfirmPassword = getActivity().findViewById(R.id.text_input_confirm_password);
         mProgressBar = getActivity().findViewById(R.id.register_progress);
 
         // create account and redirecting back to login fragment
@@ -85,33 +86,33 @@ public class RegisterFragment extends Fragment {
         boolean validRegistration = true;
         // check for valid email
         String emailRegex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
-        String givenEmail = email.getText().toString();
-        String givenPassword = password.getText().toString();
-        String givenConfirmPassword = confirmPassword.getText().toString();
+        String givenEmail = textInputEmail.getEditText().getText().toString();
+        String givenPassword = textInputPassword.getEditText().getText().toString();
+        String givenConfirmPassword = textInputConfirmPassword.getEditText().getText().toString();
         // check for valid email given
         if (TextUtils.isEmpty(givenEmail) || !givenEmail.matches(emailRegex)) {
-            Toast.makeText(getActivity().getApplicationContext(),
-                    "Please enter a valid Email",
-                    Toast.LENGTH_SHORT)
-                    .show();
+            textInputEmail.setError("Please enter valid E-mail");
             validRegistration = false;
+        } else {
+            textInputEmail.setError(null);
         }
 
         if (!givenPassword.equals(givenConfirmPassword)) {
-            Toast.makeText(getActivity().getApplicationContext(),
-                    "Password given does not match",
-                    Toast.LENGTH_SHORT)
-                    .show();
+            textInputConfirmPassword.setError("Password given does not match");
             validRegistration = false;
+        } else {
+            textInputConfirmPassword.setError(null);
         }
 
         // check password length is at least 8
-        if (givenPassword.length() < 8) {
-            Toast.makeText(getActivity().getApplicationContext(),
-                    "Password needs to be at least 8 characters",
-                    Toast.LENGTH_SHORT)
-                    .show();
+        if (givenPassword.isEmpty()) {
+            textInputPassword.setError("Password can't be empty!");
             validRegistration = false;
+        } else if (givenPassword.length() < 8){
+            textInputPassword.setError("Password needs to be at least 8 characters");
+            validRegistration = false;
+        } else {
+            textInputPassword.setError(null);
         }
         return validRegistration;
     }
@@ -120,8 +121,8 @@ public class RegisterFragment extends Fragment {
     private void registerNewUser() {
         if (validateForm()) {
             // Create a new user account
-            final String givenEmail = email.getText().toString();
-            String givenPassword = password.getText().toString();
+            final String givenEmail = textInputEmail.getEditText().toString();
+            String givenPassword = textInputPassword.getEditText().toString();
 
             mAuth.createUserWithEmailAndPassword(givenEmail, givenPassword)
                     .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
@@ -172,9 +173,9 @@ public class RegisterFragment extends Fragment {
             // Go back to MainActivity (Homepage)
             getActivity().finish();
         } else {
-            email.setText(null);
-            password.setText(null);
-            confirmPassword.setText(null);
+            textInputEmail.getEditText().setText(null);
+            textInputPassword.getEditText().setText(null);
+            textInputConfirmPassword.getEditText().setText(null);
         }
     }
 

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
@@ -43,7 +44,7 @@ import edu.u.nus.readmore.R;
 import edu.u.nus.readmore.User;
 
 public class LoginFragment extends Fragment {
-    private EditText userID, userPassword;
+    private TextInputLayout textInputEmail, textInputPassword;
     private TextView forgotPW;
     private ImageButton passwordVisibilityBtn;
     private Button signUpBtn, loginBtn;
@@ -74,8 +75,8 @@ public class LoginFragment extends Fragment {
         getActivity().setTitle("Login");
 
         // Initialize buttons and TextViews
-        userID = getActivity().findViewById(R.id.user_id);
-        userPassword = getActivity().findViewById(R.id.user_pwd);
+        textInputEmail = getActivity().findViewById(R.id.text_input_email);
+        textInputPassword = getActivity().findViewById(R.id.text_input_password);
         forgotPW = getActivity().findViewById(R.id.tv_forgot_pwd);
         passwordVisibilityBtn = getActivity().findViewById(R.id.toggle_password_btn);
         signUpBtn = getActivity().findViewById(R.id.signup_btn);
@@ -142,19 +143,19 @@ public class LoginFragment extends Fragment {
                     passwordFlag = false;
                     passwordVisibilityBtn.setImageResource(R.drawable.ic_hide_password_24dp);
                     // set input type to textPassword
-                    userPassword.setInputType(InputType.TYPE_CLASS_TEXT |
+                    textInputPassword.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
                             InputType.TYPE_TEXT_VARIATION_PASSWORD);
                 } else {
                     // set to show password
                     passwordFlag = true;
                     passwordVisibilityBtn.setImageResource(R.drawable.ic_show_password_24dp);
                     // set input type to textVisiblePassword
-                    userPassword.setInputType(InputType.TYPE_CLASS_TEXT |
+                    textInputPassword.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
                             InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
                 }
                 // set cursor at end of EditText
-                userID.setSelection(userID.getText().length());
-                userPassword.setSelection(userPassword.getText().length());
+                textInputEmail.getEditText().setSelection(textInputEmail.getEditText().getText().length());
+                textInputPassword.getEditText().setSelection(textInputPassword.getEditText().getText().length());
             }
         });
 
@@ -179,26 +180,24 @@ public class LoginFragment extends Fragment {
         Boolean checker = true;
 
         if (TextUtils.isEmpty(ID) || !ID.matches(emailRegex)) {
-            Toast.makeText(getActivity().getApplicationContext(),
-                    "Please enter a valid Email",
-                    Toast.LENGTH_SHORT)
-                    .show();
+            textInputEmail.setError("Please enter a valid Email");
             checker = false;
+        } else {
+            textInputEmail.setError(null);
         }
         if (TextUtils.isEmpty(Password)) {
-            Toast.makeText(getActivity().getApplicationContext(),
-                    "Please enter a Password",
-                    Toast.LENGTH_SHORT)
-                    .show();
+            textInputPassword.setError("Please enter a Password");
             checker = false;
+        } else {
+            textInputPassword.setError(null);
         }
         return checker;
     }
 
     private void loginUser() {
         String ID, Password;
-        ID = userID.getText().toString();
-        Password = userPassword.getText().toString();
+        ID = textInputEmail.getEditText().getText().toString();
+        Password = textInputPassword.getEditText().getText().toString();
 
         if (verifyLoginInput(ID, Password)) {
             mAuth.signInWithEmailAndPassword(ID, Password)
