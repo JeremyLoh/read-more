@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatDelegate;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,27 +26,31 @@ public class SettingsFragment extends Fragment {
         Boolean isNightTheme = restorePrefData();
         // Setting theme upon launching
         if (isNightTheme) {
-            getActivity().setTheme(R.style.AppThemeDark);
-        } else {
+            Log.d("nightOrDay", "" + isNightTheme);
             getActivity().setTheme(R.style.AppTheme);
+        } else {
+            Log.d("nightOrDay", "" + isNightTheme);
+            getActivity().setTheme(R.style.AppThemeDark);
         }
+        //test
+        Log.d("viewCreate", "called");
 
         super.onViewCreated(view, savedInstanceState);
         Switch themeBtn = getActivity().findViewById(R.id.theme_btn);
         if (isNightTheme) {
             themeBtn.setChecked(true);
-        } else {
-            themeBtn.setChecked(false);
         }
         themeBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    Log.d("themebtn", "" + isChecked);
                     saveThemeData(true);
-//                    refreshFragment();
+                    refreshFragment();
                 } else {
+                    Log.d("themebtn", "" + isChecked);
                     saveThemeData(false);
-//                    refreshFragment();
+                    refreshFragment();
                 }
             }
         });
@@ -64,6 +69,7 @@ public class SettingsFragment extends Fragment {
     private boolean restorePrefData() {
         SharedPreferences pref = getActivity().getApplicationContext().getSharedPreferences("myTheme", Context.MODE_PRIVATE);
         Boolean isNightTheme = pref.getBoolean("isNightTheme", false);
+        Log.d("restorePref", "" + isNightTheme);
         return isNightTheme;
     }
 

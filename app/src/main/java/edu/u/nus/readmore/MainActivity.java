@@ -539,6 +539,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onResume() {
+        setDayNightTheme();
         Log.d("onResume", "get called");
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mFirebaseAuthStateListener);
