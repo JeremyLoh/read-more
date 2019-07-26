@@ -10,9 +10,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.res.ResourcesCompat;
 import android.util.TypedValue;
+import android.view.ContextThemeWrapper;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
@@ -72,28 +75,16 @@ public class ReadHistoryFragment extends Fragment {
                     counter++;
                     String URL = article.getUrl();
                     String title = counter + ") " + article.getTitle();
-                    TextView articleTextView = new TextView(getActivity());
-                    articleTextView.setText(title);
-                    // set TextView font
-                    articleTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
-                    Typeface typeface = ResourcesCompat.getFont(getContext(), R.font.libre_baskerville_regular);
-                    articleTextView.setTypeface(typeface);
-                    // set TextView margin and padding
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT);
-                    params.setMargins(0,0,0,16);
-                    articleTextView.setLayoutParams(params);
-                    float scale = getResources().getDisplayMetrics().density;
-                    int dpAsPixels = (int) (16 * scale + 0.5f);
-                    articleTextView.setPadding(dpAsPixels,dpAsPixels,dpAsPixels,dpAsPixels);
-                    // set color for textView
-                    articleTextView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
-                    articleTextView.setTextColor(getResources().getColor(R.color.colorWhite));
 
+                    int buttonStyle = R.style.ButtonStyle;
+                    Button button = new Button(new ContextThemeWrapper(getContext(), buttonStyle));
+                    button.setText(title);
+                    // Set gravity of text in button
+                    button.setGravity(Gravity.LEFT|Gravity.CENTER_VERTICAL);
                     View.OnClickListener onClickListener = new openURLOnClickListener(getContext(),
                             URL, this);
-                    articleTextView.setOnClickListener(onClickListener);
-                    readHistoryList.addView(articleTextView);
+                    button.setOnClickListener(onClickListener);
+                    readHistoryList.addView(button);
                 }
             }
         } else {
