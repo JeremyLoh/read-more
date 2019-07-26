@@ -5,20 +5,24 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/edit_profile"
+            android:id="@+id/nav_edit_profile"
             android:icon="@drawable/ic_profile"
             android:title="Edit Profile"
-            android:visible="true"/>
+            android:visible="true" />
         <item
-            android:id="@+id/filter"
+            android:id="@+id/nav_filter"
             android:icon="@drawable/ic_filter"
             android:title="Filter" />
+        <item
+            android:id="@+id/nav_read_history"
+            android:icon="@drawable/ic_read_history_icon_24dp"
+            android:title="Read History" />
         <item
             android:id="@+id/nav_settings"
             android:icon="@drawable/ic_settings"
             android:title="Settings" />
         <item
-            android:id="@+id/log_out"
-            android:title="Logout"/>
+            android:id="@+id/nav_log_out"
+            android:title="Logout" />
     </group>
 </menu>
