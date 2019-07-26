@@ -20,20 +20,17 @@ import edu.u.nus.readmore.MainActivity;
 import edu.u.nus.readmore.R;
 
 public class SettingsFragment extends Fragment {
+    static int switchPressedAmount = 0;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         Boolean isNightTheme = restorePrefData();
         // Setting theme upon launching
         if (isNightTheme) {
-            Log.d("nightOrDay", "" + isNightTheme);
             getActivity().setTheme(R.style.AppTheme);
         } else {
-            Log.d("nightOrDay", "" + isNightTheme);
             getActivity().setTheme(R.style.AppThemeDark);
         }
-        //test
-        Log.d("viewCreate", "called");
 
         super.onViewCreated(view, savedInstanceState);
         Switch themeBtn = getActivity().findViewById(R.id.theme_btn);
@@ -44,12 +41,12 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    Log.d("themebtn", "" + isChecked);
-                    saveThemeData(true);
+                    switchPressedAmount++;
+                    saveThemeData(isChecked);
                     refreshFragment();
                 } else {
-                    Log.d("themebtn", "" + isChecked);
-                    saveThemeData(false);
+                    switchPressedAmount++;
+                    saveThemeData(isChecked);
                     refreshFragment();
                 }
             }
@@ -69,7 +66,6 @@ public class SettingsFragment extends Fragment {
     private boolean restorePrefData() {
         SharedPreferences pref = getActivity().getApplicationContext().getSharedPreferences("myTheme", Context.MODE_PRIVATE);
         Boolean isNightTheme = pref.getBoolean("isNightTheme", false);
-        Log.d("restorePref", "" + isNightTheme);
         return isNightTheme;
     }
 
@@ -84,5 +80,11 @@ public class SettingsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_settings, container, false);
+    }
+
+    @Override
+    public void onDestroy() {
+        switchPressedAmount = 0;
+        super.onDestroy();
     }
 }

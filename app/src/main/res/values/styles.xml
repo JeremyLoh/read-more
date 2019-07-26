@@ -13,6 +13,7 @@
         <item name="textColorHint">@color/colorLightGrey</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="imageViewColor">@color/colorWhite</item>
 
     </style>
 
@@ -28,6 +29,7 @@
         <item name="textColorHint">@color/colorWhite</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="imageViewColor">@color/colorGrey</item>
         <!-- default text color of any given view -->
 
     </style>

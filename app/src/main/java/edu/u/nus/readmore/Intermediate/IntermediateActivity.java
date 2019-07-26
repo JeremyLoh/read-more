@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -134,10 +135,12 @@ public class IntermediateActivity extends AppCompatActivity {
                     .setNeutralButton("No", null)
                     .setCancelable(true)
                     .show();
+        } else if (themeHaveChanged()){
+            updateMainActivityTheme();
         } else {
             onBackPressed();
         }
-        return true;
+            return true;
     }
 
     @Override
@@ -146,9 +149,22 @@ public class IntermediateActivity extends AppCompatActivity {
         if (fm.getBackStackEntryCount() > 1) {
             // if there are more than 1 fragment
             fm.popBackStack();
+        } else if (themeHaveChanged()) {
+            updateMainActivityTheme();
         } else {
             super.onBackPressed();
         }
+    }
+
+    private boolean themeHaveChanged() {
+        return SettingsFragment.switchPressedAmount % 2 != 0;
+    }
+
+    private void updateMainActivityTheme() {
+        MainActivity.getActivityInstance().finish();
+        Intent i = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(i);
+        finish();
     }
 
     public void updateUserFilterAtInter(Map<String, Boolean> updatedUserFilter) {

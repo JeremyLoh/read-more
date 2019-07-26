@@ -303,10 +303,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         SharedPreferences prefs = getSharedPreferences("myTheme", MODE_PRIVATE);
         Boolean isNightTheme = prefs.getBoolean("isNightTheme", false);
         if (isNightTheme) {
-            Log.d("isNightTheme", "" + isNightTheme);
             setTheme(R.style.AppThemeDark_NoActionBar);
         } else {
-            Log.d("isNightTheme", "" +isNightTheme);
             setTheme(R.style.AppTheme_NoActionBar);
         }
     }
@@ -539,8 +537,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onResume() {
-        setDayNightTheme();
-        Log.d("onResume", "get called");
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mFirebaseAuthStateListener);
     }

@@ -9,5 +9,6 @@
         <attr name="drawableColor" format="color"/>
         <attr name="actionBarColor" format="color"/>
         <attr name="textColorHint" format="color"/>
+        <attr name="imageViewColor" format="color"/>
     </declare-styleable>
 </resources>
