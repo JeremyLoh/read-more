@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="dark">
+        <attr name="backgroundColor" format="color"/>
+        <attr name="surfaceBackgroundColor" format="color"/>
+        <attr name="textColor" format="color"/>
+        <attr name="buttonColor" format="color"/>
+        <attr name="tintColor" format="color"/>
+        <attr name="drawableColor" format="color"/>
+        <attr name="actionBarColor" format="color"/>
+        <attr name="textColorHint" format="color"/>
+    </declare-styleable>
+</resources>

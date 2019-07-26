@@ -43,7 +43,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/toolbar"
             android:fillViewport="true"
-            android:visibility="gone">
+            android:visibility="gone"
+            android:background="?attr/backgroundColor">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -56,6 +57,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
+                    app:cardBackgroundColor="?attr/surfaceBackgroundColor"
                     card_view:cardCornerRadius="4dp">
 
                     <LinearLayout
@@ -85,6 +87,7 @@
                             android:paddingEnd="16dp"
                             android:paddingBottom="8dp"
                             android:text=""
+                            android:textColor="?attr/textColor"
                             android:textSize="34sp"
                             android:textStyle="italic|bold" />
                         <!-- Text from Article -->
@@ -99,6 +102,7 @@
                             android:paddingEnd="16dp"
                             android:paddingBottom="16dp"
                             android:text=""
+                            android:textColor="?attr/textColor"
                             android:textSize="16sp"
                             android:textStyle="normal" />
                     </LinearLayout>
@@ -124,7 +128,9 @@
                         android:fontFamily="@font/henny_penny_regular"
                         android:padding="16dp"
                         android:text="@string/previous_article_text"
-                        android:textStyle="bold" />
+                        android:background="?attr/buttonColor"
+                        android:textStyle="bold"
+                        android:paddingEnd="8dp"/>
 
                     <Button
                         android:id="@+id/nextArticleBtn"
@@ -135,7 +141,9 @@
                         android:fontFamily="@font/henny_penny_regular"
                         android:padding="16dp"
                         android:text="@string/next_article_text"
-                        android:textStyle="bold" />
+                        android:background="?attr/buttonColor"
+                        android:textStyle="bold"
+                        android:paddingStart="8dp"/>
                 </LinearLayout>
             </RelativeLayout>
         </ScrollView>
@@ -151,6 +159,8 @@
         android:fitsSystemWindows="true"
         android:visibility="visible"
         app:headerLayout="@layout/nav_header"
-        app:menu="@menu/drawer_menu_login" />
+        app:menu="@menu/drawer_menu_login"
+        android:background="?attr/backgroundColor"
+        app:itemTextColor="?attr/textColor"/>
 
 </android.support.v4.widget.DrawerLayout>

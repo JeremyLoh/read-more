@@ -2,6 +2,7 @@ package edu.u.nus.readmore;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Build;
@@ -13,8 +14,10 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -149,9 +152,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setDayNightTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         // required for passing information from MainActivity to Filter
         INSTANCE = this;
 
@@ -293,6 +296,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (mFirebaseAuth.getCurrentUser() != null) {
                 currentUser = (User) savedInstanceState.getSerializable("User");
             }
+        }
+    }
+
+    private void setDayNightTheme() {
+        SharedPreferences prefs = getSharedPreferences("myTheme", MODE_PRIVATE);
+        Boolean isNightTheme = prefs.getBoolean("isNightTheme", false);
+        if (isNightTheme) {
+            Log.d("isNightTheme", "" + isNightTheme);
+            setTheme(R.style.AppThemeDark_NoActionBar);
+        } else {
+            Log.d("isNightTheme", "" +isNightTheme);
+            setTheme(R.style.AppTheme_NoActionBar);
         }
     }
 
@@ -524,6 +539,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onResume() {
+        Log.d("onResume", "get called");
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mFirebaseAuthStateListener);
     }

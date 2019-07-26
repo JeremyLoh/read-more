@@ -2,6 +2,7 @@ package edu.u.nus.readmore.Intermediate;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
@@ -26,6 +27,13 @@ public class IntermediateActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SharedPreferences prefs = getSharedPreferences("myTheme", MODE_PRIVATE);
+        Boolean isNightTheme = prefs.getBoolean("isNightTheme", false);
+        if (isNightTheme) {
+            setTheme(R.style.AppThemeDark);
+        } else {
+            setTheme(R.style.AppTheme);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intermediate);
 

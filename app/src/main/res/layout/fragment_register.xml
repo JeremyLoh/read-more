@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/backgroundColor"
     android:padding="16dp"
     android:scrollbarStyle="outsideOverlay">
 
@@ -15,20 +16,27 @@
             android:id="@+id/linearLayout1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:background="?attr/surfaceBackgroundColor">
 
             <!--Email field-->
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/text_input_email"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:errorEnabled="true">
+                android:layout_height="83dp"
+                android:background="?attr/surfaceBackgroundColor"
+                app:errorEnabled="true"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:textColorHint="?attr/textColorHint">
 
                 <android.support.design.widget.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/email_string"
-                    android:inputType="textEmailAddress" />
+                    android:inputType="textEmailAddress"
+                    android:textColor="?attr/textColor"
+                    android:textColorHint="?attr/textColor"/>
 
             </android.support.design.widget.TextInputLayout>
 
@@ -37,13 +45,19 @@
                 android:id="@+id/text_input_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:errorEnabled="true">
+                android:background="?attr/surfaceBackgroundColor"
+                app:errorEnabled="true"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:textColorHint="?attr/textColorHint">
 
                 <android.support.design.widget.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/password_string"
-                    android:inputType="textPassword" />
+                    android:inputType="textPassword"
+                    android:textColor="?attr/textColor"
+                    android:textColorHint="?attr/textColor" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -52,13 +66,19 @@
                 android:id="@+id/text_input_confirm_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:errorEnabled="true">
+                android:background="?attr/surfaceBackgroundColor"
+                app:errorEnabled="true"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:textColorHint="?attr/textColorHint">
 
                 <android.support.design.widget.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Confirm Password"
-                    android:inputType="textPassword" />
+                    android:inputType="textPassword"
+                    android:textColor="?attr/textColor"
+                    android:textColorHint="?attr/textColor" />
 
             </android.support.design.widget.TextInputLayout>
         </LinearLayout>
@@ -68,14 +88,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/linearLayout1"
+            android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="20dp"
-            android:orientation="vertical">
+            android:layout_marginBottom="0dp"
+            android:orientation="vertical"
+            android:background="?attr/surfaceBackgroundColor"
+            android:paddingBottom="8dp">
 
             <Button
                 android:id="@+id/register_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="?attr/buttonColor"
                 android:text="Create account" />
 
             <TextView
@@ -84,7 +109,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:gravity="center_horizontal"
-                android:text="Already a member? Login here" />
+                android:text="Already a member? Login here"
+                android:textColor="?attr/textColor" />
         </LinearLayout>
 
         <ProgressBar

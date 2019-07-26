@@ -16,7 +16,8 @@
         android:fontFamily="@font/libre_baskerville"
         android:text="@string/delete_account_text"
         android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:background="?attr/buttonColor"/>
     <ProgressBar
         android:id="@+id/delete_progress"
         android:layout_width="wrap_content"

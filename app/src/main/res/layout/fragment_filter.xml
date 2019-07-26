@@ -14,13 +14,16 @@
         android:paddingTop="16dp"
         android:paddingBottom="16dp"
         android:text="What is your interest?"
-        android:textSize="32sp" />
+        android:textSize="32sp"
+        android:textColor="?attr/textColor"
+        android:background="?attr/backgroundColor"/>
 
     <ScrollView
         android:id="@+id/interestScrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:background="?attr/backgroundColor">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -99,7 +102,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Save"
-                android:textSize="24sp"/>
+                android:textSize="24sp"
+                android:background="?attr/buttonColor"/>
         </LinearLayout>
     </ScrollView>
 
