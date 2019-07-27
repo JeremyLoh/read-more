@@ -162,6 +162,7 @@
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/drawer_menu_login"
         android:background="?attr/backgroundColor"
+        app:itemIconTint="?attr/navigationDrawerIconColor"
         app:itemTextColor="?attr/textColor"/>
 
 </android.support.v4.widget.DrawerLayout>

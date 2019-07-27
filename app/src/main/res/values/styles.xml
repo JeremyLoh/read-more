@@ -1,7 +1,6 @@
 <resources>
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.DayNight">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -14,14 +13,14 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="imageViewColor">@color/colorWhite</item>
-
+        <item name="navigationDrawerIconColor">@color/colorBlack</item>
     </style>
 
     <style name="AppThemeDark" parent="Theme.AppCompat.DayNight">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <!-- default text color of any given view -->
         <item name="backgroundColor">@color/colorBlack</item>
         <item name="textColor">@color/colorWhite</item>
         <item name="buttonColor">@color/colorAccent</item>
@@ -30,8 +29,7 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="imageViewColor">@color/colorGrey</item>
-        <!-- default text color of any given view -->
-
+        <item name="navigationDrawerIconColor">@color/colorWhite</item>
     </style>
 
     <!-- nav view theme-->

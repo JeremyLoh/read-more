@@ -11,4 +11,6 @@
         <attr name="textColorHint" format="color"/>
         <attr name="imageViewColor" format="color"/>
     </declare-styleable>
+
+    <attr name="navigationDrawerIconColor" format="color"/>
 </resources>
