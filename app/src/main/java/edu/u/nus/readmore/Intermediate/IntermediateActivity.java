@@ -161,9 +161,7 @@ public class IntermediateActivity extends AppCompatActivity {
     }
 
     private void updateMainActivityTheme() {
-        MainActivity.getActivityInstance().finish();
-        Intent i = new Intent(getApplicationContext(), MainActivity.class);
-        startActivity(i);
+        MainActivity.getActivityInstance().recreate();
         finish();
     }
 

@@ -618,6 +618,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        // recreate() has the same effect as a configuration change
+        if (changedCurrentUser && currentUser != null) {
+            updateUserDatabase(currentUser);
+        }
+
         super.onSaveInstanceState(outState);
 
         // storing article content into outState which retrieve back in onCreate
