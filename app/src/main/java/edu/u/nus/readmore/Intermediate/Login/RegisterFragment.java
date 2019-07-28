@@ -91,7 +91,7 @@ public class RegisterFragment extends Fragment {
         String givenConfirmPassword = textInputConfirmPassword.getEditText().getText().toString();
         // check for valid email given
         if (TextUtils.isEmpty(givenEmail) || !givenEmail.matches(emailRegex)) {
-            textInputEmail.setError("Please enter valid E-mail");
+            textInputEmail.setError("Please enter a valid Email");
             validRegistration = false;
         } else {
             textInputEmail.setError(null);

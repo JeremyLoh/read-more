@@ -83,7 +83,7 @@ public class ResetPasswordFragment extends Fragment {
         String emailRegex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
         if (TextUtils.isEmpty(email) || !email.matches(emailRegex)) {
             makeToastMessage("Please enter a valid Email",
-                    Toast.LENGTH_SHORT, 0, -80);
+                    Toast.LENGTH_SHORT, 0, -136);
             return false;
         }
         return true;
