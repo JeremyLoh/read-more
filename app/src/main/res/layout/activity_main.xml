@@ -12,7 +12,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="?attr/backgroundColor">
 
         <!--toolbar settings-->
         <!-- Account for toolbar default value of
@@ -43,8 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/toolbar"
             android:fillViewport="true"
-            android:visibility="gone"
-            android:background="?attr/backgroundColor">
+            android:visibility="gone">
 
             <RelativeLayout
                 android:layout_width="match_parent"
