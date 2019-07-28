@@ -126,7 +126,12 @@ public class EditProfileFragment extends Fragment {
                             }
                         }
                     });
-                    confirmDialog.setNegativeButton("Exit", null)
+                    confirmDialog.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dismissProgressBar();
+                        }
+                    })
                             .show();
                 } else if (loginType.equals(GoogleAuthProvider.GOOGLE_SIGN_IN_METHOD)) {
                     confirmDialog.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
@@ -169,7 +174,12 @@ public class EditProfileFragment extends Fragment {
                             }
                         }
                     });
-                    confirmDialog.setNegativeButton("Exit", null)
+                    confirmDialog.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dismissProgressBar();
+                        }
+                    })
                             .show();
                 }
             }
