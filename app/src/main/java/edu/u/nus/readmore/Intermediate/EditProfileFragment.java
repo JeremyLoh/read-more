@@ -67,7 +67,7 @@ public class EditProfileFragment extends Fragment {
                 AlertDialog.Builder confirmDialog = new AlertDialog.Builder(getActivity())
                         .setTitle("Delete Account")
                         .setMessage("Once you delete your account, there is no going back. Please be certain.")
-                        .setCancelable(true);
+                        .setCancelable(false);
 
                 final Toast removedAccount = makeToastMessage("You have successfully deleted your account",
                         Toast.LENGTH_LONG);
