@@ -77,8 +77,8 @@ public class LoginFragment extends Fragment {
         getActivity().setTitle("Login");
 
         // Initialize buttons and TextViews
-        textInputEmail = getActivity().findViewById(R.id.text_input_email);
-        textInputPassword = getActivity().findViewById(R.id.text_input_password);
+        textInputEmail = getActivity().findViewById(R.id.text_input_layout_email);
+        textInputPassword = getActivity().findViewById(R.id.text_input_layout_password);
         forgotPW = getActivity().findViewById(R.id.tv_forgot_pwd);
         passwordVisibilityBtn = getActivity().findViewById(R.id.toggle_password_btn);
         signUpBtn = getActivity().findViewById(R.id.signup_btn);
