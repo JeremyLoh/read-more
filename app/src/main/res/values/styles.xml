@@ -29,7 +29,7 @@
         <item name="textColorHint">@color/colorWhite</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="imageViewColor">@color/colorGrey</item>
+        <item name="imageViewColor">@color/colorWhite</item>
         <item name="navigationDrawerIconColor">@color/colorWhite</item>
         <item name="nightModeIconColor">@color/colorWhite</item>
     </style>
