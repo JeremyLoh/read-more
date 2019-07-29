@@ -13,14 +13,15 @@ import android.text.TextUtils;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,6 +51,7 @@ public class LoginFragment extends Fragment {
     private Button signUpBtn, loginBtn;
     private SignInButton googleBtn;
     private ProgressBar mProgressBar;
+    private RelativeLayout loginRelativeLayout;
 
     // flag for changing passwordVisibility
     private boolean passwordFlag = false;
@@ -84,6 +86,7 @@ public class LoginFragment extends Fragment {
         googleBtn = getActivity().findViewById(R.id.google_btn);
         mAuth = FirebaseAuth.getInstance();
         mProgressBar = getActivity().findViewById(R.id.login_progress);
+        loginRelativeLayout = getActivity().findViewById(R.id.login_relative_layout);
 
         gso = new GoogleSignInOptions
                 .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -92,6 +95,17 @@ public class LoginFragment extends Fragment {
                 .build();
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
+
+        // Hide keyboard when user clicks on any part of relative layout
+        loginRelativeLayout.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                // Check if view is being clicked
+                if (hasFocus) {
+                    hideSoftKeyBoard(getActivity().getApplicationContext(), v);
+                }
+            }
+        });
 
         //setting login button activity
         loginBtn.setOnClickListener(new View.OnClickListener() {
@@ -103,7 +117,7 @@ public class LoginFragment extends Fragment {
                 getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                         WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                 // hide soft keyboard for better UI
-                hideKeyBoardFrom(getActivity().getApplicationContext(), getView().getRootView());
+                hideSoftKeyBoard(getActivity().getApplicationContext(), getView().getRootView());
                 loginUser();
             }
         });
@@ -116,7 +130,7 @@ public class LoginFragment extends Fragment {
         signUpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideKeyBoardFrom(getActivity().getApplicationContext(), getView().getRootView());
+                hideSoftKeyBoard(getActivity().getApplicationContext(), getView().getRootView());
                 toRegFt.replace(R.id.intermediate_frame_layout, new RegisterFragment());
                 toRegFt.addToBackStack("Register");
                 toRegFt.commit();
@@ -127,7 +141,7 @@ public class LoginFragment extends Fragment {
         forgotPW.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideKeyBoardFrom(getActivity().getApplicationContext(), getView().getRootView());
+                hideSoftKeyBoard(getActivity().getApplicationContext(), getView().getRootView());
                 toRegFt.replace(R.id.intermediate_frame_layout, new ResetPasswordFragment());
                 toRegFt.addToBackStack("ForgotPW");
                 toRegFt.commit();
@@ -163,13 +177,13 @@ public class LoginFragment extends Fragment {
         googleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideKeyBoardFrom(getActivity().getApplicationContext(), getView().getRootView());
+                hideSoftKeyBoard(getActivity().getApplicationContext(), getView().getRootView());
                 signIn();
             }
         });
     }
 
-    private void hideKeyBoardFrom(Context context, View view) {
+    private void hideSoftKeyBoard(Context context, View view) {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }

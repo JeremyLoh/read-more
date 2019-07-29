@@ -8,6 +8,9 @@
     android:scrollbarStyle="outsideOverlay">
 
     <RelativeLayout
+        android:id="@+id/register_account_relative_layout"
+        android:clickable="true"
+        android:focusableInTouchMode="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="?attr/actionBarSize">

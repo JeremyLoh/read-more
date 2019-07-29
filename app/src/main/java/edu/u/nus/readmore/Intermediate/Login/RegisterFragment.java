@@ -17,6 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +40,7 @@ public class RegisterFragment extends Fragment {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static final String TAG = "EmailPassword";
     private ProgressBar mProgressBar;
+    private RelativeLayout registerRelativeLayout;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,6 +61,7 @@ public class RegisterFragment extends Fragment {
         textInputPassword = getActivity().findViewById(R.id.text_input_password);
         textInputConfirmPassword = getActivity().findViewById(R.id.text_input_confirm_password);
         mProgressBar = getActivity().findViewById(R.id.register_progress);
+        registerRelativeLayout = getActivity().findViewById(R.id.register_account_relative_layout);
 
         // create account and redirecting back to login fragment
         createAccBtn.setOnClickListener(new View.OnClickListener() {
@@ -80,6 +83,22 @@ public class RegisterFragment extends Fragment {
                 backToLogin();
             }
         });
+
+        // Hide keyboard when user clicks on any part of relative layout
+        registerRelativeLayout.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                // Check if view is being clicked
+                if (hasFocus) {
+                    hideSoftKeyBoard(getActivity().getApplicationContext(), v);
+                }
+            }
+        });
+    }
+
+    private void hideSoftKeyBoard(Context context, View view) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     private boolean validateForm() {
@@ -108,7 +127,7 @@ public class RegisterFragment extends Fragment {
         if (givenPassword.isEmpty()) {
             textInputPassword.setError("Password can't be empty!");
             validRegistration = false;
-        } else if (givenPassword.length() < 8){
+        } else if (givenPassword.length() < 8) {
             textInputPassword.setError("Password needs to be at least 8 characters");
             validRegistration = false;
         } else {

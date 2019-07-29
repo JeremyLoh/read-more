@@ -8,6 +8,9 @@
     android:scrollbarStyle="outsideOverlay">
 
     <RelativeLayout
+        android:id="@+id/login_relative_layout"
+        android:clickable="true"
+        android:focusableInTouchMode="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/backgroundColor"
