@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private User currentUser = null;
     private boolean changedCurrentUser;
     static MainActivity INSTANCE;
+    private long lastClickTime = 0;
 
     // Testing
     private static int counter = 0;
@@ -222,21 +224,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         nextArticleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentUser == null) {
-                    // Guest mode, random article generated, displayed
-                    getNewArticle();
-                } else {
-                    Article nextArticle = currentUser.accessNextArticle();
-                    if (nextArticle != null) {
-                        currentArticle = nextArticle;
-                        displayArticle(currentArticle);
-                    } else {
-                        addToReadList(currentArticle);
-                        // Get new article, check user readList for duplicate article
-                        // Add to user readlist
+                // misclicking prevention using threshold of 1000ms
+                if (SystemClock.elapsedRealtime() - lastClickTime > 1000) {
+                    lastClickTime = SystemClock.elapsedRealtime();
+                    if (currentUser == null) {
+                        // Guest mode, random article generated, displayed
                         getNewArticle();
+                    } else {
+                        Article nextArticle = currentUser.accessNextArticle();
+                        if (nextArticle != null) {
+                            currentArticle = nextArticle;
+                            displayArticle(currentArticle);
+                        } else {
+                            addToReadList(currentArticle);
+                            // Get new article, check user readList for duplicate article
+                            // Add to user readlist
+                            getNewArticle();
+                        }
+                        changedCurrentUser = true;
                     }
-                    changedCurrentUser = true;
                 }
             }
         });
@@ -244,12 +250,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         previousArticleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Article previousArticle = currentUser.accessPreviousArticle();
-                if (previousArticle != null) {
-                    currentArticle = previousArticle;
-                    changedCurrentUser = true;
+                // misclicking prevention using threshold of 1000ms
+                if (SystemClock.elapsedRealtime() - lastClickTime > 1000) {
+                    lastClickTime = SystemClock.elapsedRealtime();
+                    Article previousArticle = currentUser.accessPreviousArticle();
+                    if (previousArticle != null) {
+                        currentArticle = previousArticle;
+                        changedCurrentUser = true;
+                    }
+                    displayArticle(currentArticle);
                 }
-                displayArticle(currentArticle);
             }
         });
 
@@ -363,10 +373,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Query subTopic;
         if (new Random().nextInt(2) == 1) {
             subTopic = topicRef.whereGreaterThan("ID", checker).limit(1);
-            counter++;
         } else {
             subTopic = topicRef.whereLessThanOrEqualTo("ID", checker).limit(1);
-            counter++;
         }
         subTopic.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override

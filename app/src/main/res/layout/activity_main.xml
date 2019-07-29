@@ -68,13 +68,13 @@
                         <!-- Image -->
                         <ImageView
                             android:id="@+id/articleImageView"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="0dp"
                             android:layout_weight="1"
                             android:adjustViewBounds="true"
                             android:clickable="true"
+                            android:layout_gravity="center"
                             android:maxHeight="300dp"
-                            android:paddingTop="16dp"
                             android:scaleType="centerCrop"
                             android:background="?attr/imageViewColor"/>
                         <!-- Title of Article -->
