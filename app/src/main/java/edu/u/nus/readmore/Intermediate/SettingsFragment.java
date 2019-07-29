@@ -33,6 +33,11 @@ public class SettingsFragment extends Fragment {
         }
 
         super.onViewCreated(view, savedInstanceState);
+
+        if (savedInstanceState != null) {
+            switchPressedAmount = savedInstanceState.getInt("switchPressedAmount");
+        }
+
         Switch themeBtn = getActivity().findViewById(R.id.theme_btn);
         if (isNightTheme) {
             themeBtn.setChecked(true);
@@ -57,9 +62,11 @@ public class SettingsFragment extends Fragment {
         Fragment currentFrag = getActivity().getSupportFragmentManager().findFragmentById(R.id.intermediate_frame_layout);
         if (currentFrag instanceof SettingsFragment) {
             FragmentTransaction fragmentTransaction = (getActivity()).getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
             fragmentTransaction.detach(currentFrag);
             fragmentTransaction.attach(currentFrag);
             fragmentTransaction.commit();
+
         }
     }
 
@@ -86,5 +93,11 @@ public class SettingsFragment extends Fragment {
     public void onDestroy() {
         switchPressedAmount = 0;
         super.onDestroy();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("switchPressedAmount", switchPressedAmount);
     }
 }

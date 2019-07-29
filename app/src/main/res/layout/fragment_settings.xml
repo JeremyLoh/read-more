@@ -17,6 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:drawableStart="@drawable/ic_night_mode_icon_24dp"
+            android:drawableTint="?attr/nightModeIconColor"
             android:drawablePadding="8dp"
             android:text="Night Mode"
             android:textColor="?attr/textColor"
