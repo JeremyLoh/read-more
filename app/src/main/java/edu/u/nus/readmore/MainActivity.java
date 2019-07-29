@@ -371,11 +371,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         String randomTopic = randomTopicGenerator();
         CollectionReference topicRef = db.collection(randomTopic);
         Query subTopic;
-        if (new Random().nextInt(2) == 1) {
-            subTopic = topicRef.whereGreaterThan("ID", checker).limit(1);
-        } else {
-            subTopic = topicRef.whereLessThanOrEqualTo("ID", checker).limit(1);
-        }
+        subTopic = topicRef.whereGreaterThanOrEqualTo("ID", checker).limit(1);
         subTopic.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
