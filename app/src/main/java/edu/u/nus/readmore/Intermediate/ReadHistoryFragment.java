@@ -45,6 +45,7 @@ public class ReadHistoryFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        getActivity().setTitle("Read History");
 
         readHistoryScrollView = getActivity().findViewById(R.id.readHistoryScrollView);
         readHistoryList = getActivity().findViewById(R.id.readHistoryList);

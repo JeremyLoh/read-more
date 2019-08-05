@@ -33,6 +33,7 @@ public class SettingsFragment extends Fragment {
         }
 
         super.onViewCreated(view, savedInstanceState);
+        getActivity().setTitle("Settings");
 
         if (savedInstanceState != null) {
             switchPressedAmount = savedInstanceState.getInt("switchPressedAmount");

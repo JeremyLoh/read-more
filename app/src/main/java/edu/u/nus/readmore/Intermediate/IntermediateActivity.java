@@ -72,7 +72,6 @@ public class IntermediateActivity extends AppCompatActivity {
                     .commit();
         } else if (currentIntent.hasExtra(getString(R.string.settings_key)) && savedInstanceState == null) {
             // Set name of Action Bar
-            getSupportActionBar().setTitle(R.string.settings_key);
             // Loads SettingsFragment
             fragmentTransaction.replace(R.id.intermediate_frame_layout, new SettingsFragment())
                     .commit();
@@ -83,17 +82,14 @@ public class IntermediateActivity extends AppCompatActivity {
             bundle.putSerializable("Filter", (HashMap<String, Boolean>) uFilterHashMap);
             FilterFragment filterFragment = new FilterFragment();
             filterFragment.setArguments(bundle);
-            getSupportActionBar().setTitle(getString(R.string.filter_key));
             fragmentTransaction.replace(R.id.intermediate_frame_layout, filterFragment)
                     .commit();
         } else if (currentIntent.hasExtra(getString(R.string.edit_profile_key)) && savedInstanceState == null) {
             // Set name of Action Bar
-            getSupportActionBar().setTitle("Edit Profile");
             // Load EditProfileFragment
             fragmentTransaction.replace(R.id.intermediate_frame_layout, new EditProfileFragment())
                     .commit();
         } else if (currentIntent.hasExtra(getString(R.string.read_history_key)) && savedInstanceState == null) {
-            getSupportActionBar().setTitle("Read History");
             String readHistoryKey = getString(R.string.read_history_key);
             currentUser = (User) getIntent().getSerializableExtra(readHistoryKey);
             Bundle bundle = new Bundle();

@@ -42,6 +42,7 @@ public class EditProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        getActivity().setTitle("Edit Profile");
 
         mAuth = FirebaseAuth.getInstance();
         mProgressBar = getActivity().findViewById(R.id.delete_progress);

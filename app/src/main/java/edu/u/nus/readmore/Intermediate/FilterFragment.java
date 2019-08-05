@@ -26,6 +26,7 @@ public class FilterFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        getActivity().setTitle("Filter");
         intermediateActivity = (IntermediateActivity) getActivity();
         // For changing screen orientation
         if (savedInstanceState != null) {
