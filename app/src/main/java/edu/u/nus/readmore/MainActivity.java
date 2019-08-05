@@ -1,9 +1,12 @@
 package edu.u.nus.readmore;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.SystemClock;
@@ -15,7 +18,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
@@ -78,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private boolean changedCurrentUser;
     static MainActivity INSTANCE;
     private long lastClickTime = 0;
+    private View noInternetConnectionView;
+    private Button retryInternetConnectionBtn;
 
     // Testing
     private static int counter = 0;
@@ -100,30 +104,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     // For MenuItem selected
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.logout_item:
-                new AlertDialog.Builder(this)
-                        .setTitle("Logout")
-                        .setMessage("Do you want to logout?")
-                        .setCancelable(true)
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                logout();
-                            }
-                        })
-                        .setNegativeButton("No", null)
-                        .show();
-                break;
-            case R.id.toolbar_share_item:
-                Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-                sharingIntent.setType("text/plain");
-                String shareTitle = currentArticle.getTitle();
-                String shareBody = currentArticle.getUrl();
-                sharingIntent.putExtra(Intent.EXTRA_SUBJECT, shareTitle);
-                sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
-                startActivity(Intent.createChooser(sharingIntent, "Share Using"));
-                break;
+        if (hasInternetConnection()) {
+            switch (item.getItemId()) {
+                case R.id.logout_item:
+                    new AlertDialog.Builder(this)
+                            .setTitle("Logout")
+                            .setMessage("Do you want to logout?")
+                            .setCancelable(true)
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    logout();
+                                }
+                            })
+                            .setNegativeButton("No", null)
+                            .show();
+                    break;
+                case R.id.toolbar_share_item:
+                    Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+                    sharingIntent.setType("text/plain");
+                    String shareTitle = currentArticle.getTitle();
+                    String shareBody = currentArticle.getUrl();
+                    sharingIntent.putExtra(Intent.EXTRA_SUBJECT, shareTitle);
+                    sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+                    startActivity(Intent.createChooser(sharingIntent, "Share Using"));
+                    break;
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -186,6 +192,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         articleScrollView = findViewById(R.id.articleScrollView);
         progressBar = findViewById(R.id.progressBar);
         navHeaderUserEmail = navigationView.getHeaderView(0).findViewById(R.id.nav_user_email);
+        noInternetConnectionView = findViewById(R.id.no_internet_connection_view);
+        retryInternetConnectionBtn = noInternetConnectionView.findViewById(R.id.retry_internet_connection_btn);
+
+        retryInternetConnectionBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // check for valid internet connection
+                if (hasInternetConnection()) {
+                    // refresh main activity
+                    Intent refreshActivity = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(refreshActivity);
+                    finish();
+                }
+            }
+        });
 
         // Initialise Firebase components
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -225,24 +246,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View v) {
                 // misclicking prevention using threshold of 1000ms
-                if (SystemClock.elapsedRealtime() - lastClickTime > 1000) {
-                    lastClickTime = SystemClock.elapsedRealtime();
-                    if (currentUser == null) {
-                        // Guest mode, random article generated, displayed
-                        getNewArticle();
-                    } else {
-                        Article nextArticle = currentUser.accessNextArticle();
-                        if (nextArticle != null) {
-                            currentArticle = nextArticle;
-                            displayArticle(currentArticle);
-                        } else {
-                            addToReadList(currentArticle);
-                            // Get new article, check user readList for duplicate article
-                            // Add to user readlist
+                // check for valid internet connection
+                if (hasInternetConnection()) {
+                    if (SystemClock.elapsedRealtime() - lastClickTime > 1000) {
+                        lastClickTime = SystemClock.elapsedRealtime();
+                        if (currentUser == null) {
+                            // Guest mode, random article generated, displayed
                             getNewArticle();
+                        } else {
+                            Article nextArticle = currentUser.accessNextArticle();
+                            if (nextArticle != null) {
+                                currentArticle = nextArticle;
+                                displayArticle(currentArticle);
+                            } else {
+                                addToReadList(currentArticle);
+                                // Get new article, check user readList for duplicate article
+                                // Add to user readlist
+                                getNewArticle();
+                            }
+                            changedCurrentUser = true;
                         }
-                        changedCurrentUser = true;
                     }
+                } else {
+                    noInternetConnectionView.setVisibility(View.VISIBLE);
+                    noInternetConnectionView.bringToFront();
                 }
             }
         });
@@ -271,7 +298,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             // Check if user is logged in
             FirebaseUser firebaseUser = mFirebaseAuth.getCurrentUser();
             // Get user object
-            if (firebaseUser != null) {
+            if (firebaseUser != null && hasInternetConnection()) {
                 final String userID = firebaseUser.getUid();
                 DocumentReference userDoc = db.collection("Users").document(userID);
                 userDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -294,7 +321,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 });
             } else {
-                getNewArticle();
+                if (hasInternetConnection()) {
+                    getNewArticle();
+                } else {
+                    // no internet connection
+                    noInternetConnectionView.setVisibility(View.VISIBLE);
+                    noInternetConnectionView.bringToFront();
+                }
             }
         } else {
             currentArticle = new Article(savedInstanceState.getString("title"),
@@ -317,6 +350,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             setTheme(R.style.AppTheme_NoActionBar);
         }
+    }
+
+    private boolean hasInternetConnection() {
+        // return a boolean corresponding to whether device is connected to internet
+        ConnectivityManager connectivityManager = (ConnectivityManager)
+                this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+        return isConnected;
     }
 
     private void setCurrentUser() {
@@ -635,14 +678,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         super.onSaveInstanceState(outState);
-
-        // storing article content into outState which retrieve back in onCreate
-        outState.putString("title", currentArticle.getTitle());
-        outState.putString("description", currentArticle.getDescription());
-        outState.putString("pageid", currentArticle.getPageid());
-        outState.putString("URL", currentArticle.getUrl());
-        outState.putString("imageURL", currentArticle.getImageURL());
-
+        if (currentArticle != null) {
+            // storing article content into outState which retrieve back in onCreate
+            outState.putString("title", currentArticle.getTitle());
+            outState.putString("description", currentArticle.getDescription());
+            outState.putString("pageid", currentArticle.getPageid());
+            outState.putString("URL", currentArticle.getUrl());
+            outState.putString("imageURL", currentArticle.getImageURL());
+        }
         // For rotating screen plus changing user filter
         if (currentUser != null) {
             outState.putSerializable("User", currentUser);

@@ -12,8 +12,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="?attr/backgroundColor">
+        android:background="?attr/backgroundColor"
+        android:orientation="vertical">
 
         <!--toolbar settings-->
         <!-- Account for toolbar default value of
@@ -35,6 +35,15 @@
             android:id="@+id/progressBar"
             android:layout_width="100dp"
             android:layout_height="100dp"
+            android:layout_centerInParent="true"
+            android:visibility="gone" />
+
+        <!-- View for no internet connection -->
+        <include
+            android:id="@+id/no_internet_connection_view"
+            layout="@layout/no_internet_connection"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_centerInParent="true"
             android:visibility="gone" />
 
@@ -70,13 +79,13 @@
                             android:id="@+id/articleImageView"
                             android:layout_width="wrap_content"
                             android:layout_height="0dp"
+                            android:layout_gravity="center"
                             android:layout_weight="1"
                             android:adjustViewBounds="true"
+                            android:background="?attr/imageViewColor"
                             android:clickable="true"
-                            android:layout_gravity="center"
                             android:maxHeight="300dp"
-                            android:scaleType="centerCrop"
-                            android:background="?attr/imageViewColor"/>
+                            android:scaleType="centerCrop" />
                         <!-- Title of Article -->
                         <TextView
                             android:id="@+id/articleTitleTextView"
@@ -124,27 +133,27 @@
                         android:id="@+id/previousArticleBtn"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
                         android:layout_weight="1"
+                        android:background="?attr/buttonColor"
                         android:drawableStart="@drawable/ic_arrow_upward_black_24dp"
                         android:fontFamily="@font/henny_penny_regular"
                         android:padding="16dp"
                         android:text="@string/previous_article_text"
-                        android:background="?attr/buttonColor"
-                        android:textStyle="bold"
-                        android:layout_marginEnd="4dp"/>
+                        android:textStyle="bold" />
 
                     <Button
                         android:id="@+id/nextArticleBtn"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
                         android:layout_weight="1"
+                        android:background="?attr/buttonColor"
                         android:drawableEnd="@drawable/ic_arrow_downward_black_24dp"
                         android:fontFamily="@font/henny_penny_regular"
                         android:padding="16dp"
                         android:text="@string/next_article_text"
-                        android:background="?attr/buttonColor"
-                        android:textStyle="bold"
-                        android:layout_marginStart="4dp"/>
+                        android:textStyle="bold" />
                 </LinearLayout>
             </RelativeLayout>
         </ScrollView>
@@ -157,12 +166,12 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:background="?attr/backgroundColor"
         android:fitsSystemWindows="true"
         android:visibility="visible"
         app:headerLayout="@layout/nav_header"
-        app:menu="@menu/drawer_menu_login"
-        android:background="?attr/backgroundColor"
         app:itemIconTint="?attr/navigationDrawerIconColor"
-        app:itemTextColor="?attr/textColor"/>
+        app:itemTextColor="?attr/textColor"
+        app:menu="@menu/drawer_menu_login" />
 
 </android.support.v4.widget.DrawerLayout>

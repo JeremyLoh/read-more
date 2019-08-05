@@ -25,5 +25,6 @@
     <!-- common use strings-->
     <string name="email_string">Email</string>
     <string name="password_string">Password</string>
-
+    <!-- No internet connection text -->
+    <string name="no_internet">"Slow or no internet connection.\nPlease check your network connection."</string>
 </resources>
