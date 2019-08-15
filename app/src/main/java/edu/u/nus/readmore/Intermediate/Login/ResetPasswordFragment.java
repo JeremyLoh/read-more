@@ -79,6 +79,12 @@ public class ResetPasswordFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        hideKeyBoardFrom(getActivity().getApplicationContext(), getView().getRootView());
+    }
+
     private boolean validEmailFormat(String email) {
         String emailRegex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
         if (TextUtils.isEmpty(email) || !email.matches(emailRegex)) {
