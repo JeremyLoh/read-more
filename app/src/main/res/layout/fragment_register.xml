@@ -40,7 +40,8 @@
                     android:hint="@string/email_string"
                     android:inputType="textEmailAddress"
                     android:textColor="?attr/textColor"
-                    android:textColorHint="?attr/textColor"/>
+                    android:textColorHint="?attr/textColor"
+                    android:theme="@style/MyEditTextStyle"/>
 
             </android.support.design.widget.TextInputLayout>
 
@@ -61,7 +62,8 @@
                     android:hint="@string/password_string"
                     android:inputType="textPassword"
                     android:textColor="?attr/textColor"
-                    android:textColorHint="?attr/textColor" />
+                    android:textColorHint="?attr/textColor"
+                    android:theme="@style/MyEditTextStyle"/>
 
             </android.support.design.widget.TextInputLayout>
 
@@ -82,7 +84,8 @@
                     android:hint="Confirm Password"
                     android:inputType="textPassword"
                     android:textColor="?attr/textColor"
-                    android:textColorHint="?attr/textColor" />
+                    android:textColorHint="?attr/textColor"
+                    android:theme="@style/MyEditTextStyle"/>
 
             </android.support.design.widget.TextInputLayout>
         </LinearLayout>

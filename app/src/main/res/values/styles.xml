@@ -89,4 +89,9 @@
         (e.g. backgroundTint instead of app:backgroundTint) -->
         <item name="colorButtonNormal">@color/colorAccent</item>
     </style>
+    
+    <!--Style for Edit text underline-->
+    <style name="MyEditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="android:colorControlNormal">@color/colorGrey</item>
+    </style>
 </resources>
