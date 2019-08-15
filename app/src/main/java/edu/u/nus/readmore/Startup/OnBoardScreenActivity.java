@@ -55,7 +55,7 @@ public class OnBoardScreenActivity extends AppCompatActivity {
         mList.add(new ScreenItem("Users", "Our app allows you to read even if you wish to remain anonymous! However, you can enjoy a better experience while reading from logging in, so what are you waiting for?", R.drawable.guest_or_user));
         mList.add(new ScreenItem("Navigating through the app", "Fear of complex navigation through app? Fear not, navigating Read More is a piece of cake! Simply click on the burger icon circled in the image to navigate through our app!", R.drawable.tutorial_1));
         mList.add(new ScreenItem("Navigating through the app", "As an anonymous user you will only see 2 navigation items available. You can either change the theme of your app through the 'Settings' option or simply press 'Login' to have a better reading experience!", R.drawable.tutorial_2));
-        mList.add(new ScreenItem("Further adventures!", "Once you are logged-in, you can edit your profile and even indicate your preference on what kind of articles you wish to see!", R.drawable.tutorial_3));
+        mList.add(new ScreenItem("Further adventures!", "Once you are logged-in, you can edit your profile, indicate topics that are of your interest, browse your read history and even change the theme of the app!", R.drawable.tutorial_3));
         mList.add(new ScreenItem("What are you waiting for?", "Click on the 'Get Started' button to enjoy reading randomised article at your fingertip! Have fun!", R.drawable.read_more_logo));
 
         // instantiate views
