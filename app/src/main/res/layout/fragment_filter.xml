@@ -1,113 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/backgroundColor"
+    android:gravity="center_vertical"
     android:orientation="vertical">
 
     <TextView
         android:id="@+id/interest"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
+        android:background="?attr/backgroundColor"
+        android:fontFamily="@font/henny_penny_regular"
+        android:gravity="center_horizontal"
         android:paddingTop="16dp"
         android:paddingBottom="16dp"
         android:text="What is your interest?"
-        android:textSize="32sp"
         android:textColor="?attr/textColor"
-        android:background="?attr/backgroundColor"/>
+        android:textSize="28sp" />
 
-    <ScrollView
-        android:id="@+id/interestScrollView"
+    <Button
+        android:id="@+id/saveButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/interest"
+        android:background="?attr/buttonColor"
+        android:padding="16dp"
+        android:text="Save"
+        android:textColor="@color/colorWhite"
+        android:textSize="24sp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/saveButton"
+        android:background="?attr/backgroundColor"
         android:fillViewport="true"
-        android:background="?attr/backgroundColor">
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/filterButtonArts"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/button_arts_background"
-                    android:text="@string/arts"
-                    android:textColor="#FFFFFF"
-                    android:textSize="24sp" />
-
-
-                <Button
-                    android:id="@+id/filterButtonHistory"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/button_history_background"
-                    android:text="@string/history"
-                    android:textColor="#FFFFFF"
-                    android:textSize="24sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/filterButtonScience"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/button_science_background"
-                    android:text="@string/science"
-                    android:textColor="#FFFFFF"
-                    android:textSize="24sp" />
-
-                <Button
-                    android:id="@+id/filterButtonMath"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/button_mathematics_background"
-                    android:text="@string/math"
-                    android:textColor="#FFFFFF"
-                    android:textSize="24sp" />
-            </LinearLayout>
             <Button
-                android:id="@+id/saveButton"
+                android:id="@+id/filterButtonArts"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Save"
-                android:textSize="24sp"
-                android:background="?attr/buttonColor"
-                android:layout_marginEnd="16dp"
-                android:layout_marginStart="16dp"/>
+                android:background="@drawable/button_arts_background"
+                android:text="@string/arts"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp" />
+
+            <Button
+                android:id="@+id/filterButtonHistory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_history_background"
+                android:text="@string/history"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp" />
+
+            <Button
+                android:id="@+id/filterButtonScience"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_science_background"
+                android:text="@string/science"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp" />
+
+            <Button
+                android:id="@+id/filterButtonMath"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_mathematics_background"
+                android:text="@string/math"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp" />
+
         </LinearLayout>
     </ScrollView>
-
-
-</LinearLayout>
+</RelativeLayout>
