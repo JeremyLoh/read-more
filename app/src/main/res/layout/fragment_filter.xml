@@ -81,6 +81,16 @@
                 android:textColor="#FFFFFF"
                 android:textSize="24sp" />
 
+            <Button
+                android:id="@+id/filterButtonComputerScience"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/buttonHighlight"
+                android:text="@string/computer_science"
+                android:textColor="#FFFFFF"
+                android:paddingTop="48dp"
+                android:paddingBottom="48dp"
+                android:textSize="24sp" />
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>

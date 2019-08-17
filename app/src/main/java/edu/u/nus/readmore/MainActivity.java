@@ -75,7 +75,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ScrollView articleScrollView;
     private Button previousArticleBtn, nextArticleBtn;
     private Article currentArticle = null;
-    private final List<String> listOfTopics = Arrays.asList("Science", "Math", "History", "Arts");
+    private final List<String> listOfTopics = Arrays.asList("Science", "Math", "History", "Arts",
+            "Computer Science");
     private User currentUser = null;
     private boolean changedCurrentUser;
     static MainActivity INSTANCE;

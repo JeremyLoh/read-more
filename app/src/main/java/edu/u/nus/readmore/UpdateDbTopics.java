@@ -32,7 +32,7 @@ import java.util.Map;
 
 class UpdateDbTopics extends AsyncTask<Void, Void, Void> {
     private List<String> categoryFiles = new ArrayList<>(
-            Arrays.asList("History.txt"));
+            Arrays.asList("Computer Science.txt"));
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private AssetManager assetManager;
 
