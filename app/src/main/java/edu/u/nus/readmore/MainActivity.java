@@ -343,6 +343,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    private void fetchMissingFilterCategories() {
+        Map<String, Boolean> userFilter = currentUser.getUserFilter();
+        boolean needToUpdateDB = false;
+        for (String topic : listOfTopics) {
+            // Check for missing filter categories
+            Boolean topicExists = userFilter.get(topic);
+            if (topicExists == null) {
+                // create topic in user filter
+                currentUser.addFilterTopic(topic, true);
+                needToUpdateDB = true;
+            }
+        }
+        if (needToUpdateDB) {
+            updateUserDatabase(currentUser);
+        }
+    }
+
     private void setDayNightTheme() {
         SharedPreferences prefs = getSharedPreferences("myTheme", MODE_PRIVATE);
         Boolean isNightTheme = prefs.getBoolean("isNightTheme", false);
@@ -441,9 +458,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private String randomTopicGenerator() {
         if (currentUser != null) {
+            fetchMissingFilterCategories();
+            Map<String, Boolean> userFilter = currentUser.getUserFilter();
             List<String> userFilteredList = new ArrayList<>();
             for (String topic : listOfTopics) {
-                if (currentUser.getUserFilter().get(topic)) {
+                Boolean topicExists = userFilter.get(topic);
+                if (topicExists != null && topicExists) {
                     userFilteredList.add(topic);
                 }
             }
@@ -570,6 +590,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void startInterActHashMap(String key) {
+        fetchMissingFilterCategories();
         HashMap<String, Boolean> userFilter =
                 (HashMap<String, Boolean>) currentUser.getUserFilter();
         Intent startIntent = new Intent(getApplicationContext(), IntermediateActivity.class);
