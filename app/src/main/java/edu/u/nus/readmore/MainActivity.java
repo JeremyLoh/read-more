@@ -58,7 +58,7 @@ import edu.u.nus.readmore.Intermediate.IntermediateActivity;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         AsyncArticleResponse {
-    private boolean TESTING_DB = false;
+    private boolean TESTING_DB = true;
 
     private DrawerLayout drawer;
     private Menu optionsMenu;
@@ -76,16 +76,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Button previousArticleBtn, nextArticleBtn;
     private Article currentArticle = null;
     private final List<String> listOfTopics = Arrays.asList("Science", "Math", "History", "Arts",
-            "Computer Science");
+            "Computer Science", "Sports");
     private User currentUser = null;
     private boolean changedCurrentUser;
     static MainActivity INSTANCE;
     private long lastClickTime = 0;
     private View noInternetConnectionView;
     private Button retryInternetConnectionBtn;
-
-    // Testing
-    private static int counter = 0;
 
     // onCreateOptionsMenu is called once
     @Override
