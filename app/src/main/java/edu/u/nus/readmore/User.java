@@ -53,6 +53,10 @@ public class User implements Serializable {
         return userFilter;
     }
 
+    public void addFilterTopic(String topic, Boolean value) {
+        userFilter.put(topic, value);
+    }
+
     public boolean hasReadArticle(Article article) {
         if (readList.size() == 0) {
             return false;
