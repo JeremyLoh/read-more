@@ -58,7 +58,7 @@ import edu.u.nus.readmore.Intermediate.IntermediateActivity;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         AsyncArticleResponse {
-    private boolean TESTING_DB = true;
+    private boolean TESTING_DB = false;
 
     private DrawerLayout drawer;
     private Menu optionsMenu;
