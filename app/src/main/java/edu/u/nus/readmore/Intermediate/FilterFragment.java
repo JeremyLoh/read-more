@@ -18,8 +18,10 @@ import edu.u.nus.readmore.Intermediate.IntermediateActivity;
 import edu.u.nus.readmore.R;
 
 public class FilterFragment extends Fragment {
-    Button artsButton, historyButton, mathButton, scienceButton, computerScienceButton, saveButton;
-    Boolean artsBool, historyBool, mathBool, scienceBool, computerScienceBool;
+    Button artsButton, historyButton, mathButton,
+            scienceButton, computerScienceButton, sportsButton,
+            saveButton;
+    Boolean artsBool, historyBool, mathBool, scienceBool, computerScienceBool, sportsBool;
     Map<String, Boolean> passBackHM = new HashMap<>();
     IntermediateActivity intermediateActivity;
 
@@ -35,6 +37,7 @@ public class FilterFragment extends Fragment {
             mathBool = savedInstanceState.getBoolean("Math");
             scienceBool = savedInstanceState.getBoolean("Science");
             computerScienceBool = savedInstanceState.getBoolean("Computer Science");
+            sportsBool = savedInstanceState.getBoolean("Sports");
         }
 
         artsButton = getActivity().findViewById(R.id.filterButtonArts);
@@ -42,6 +45,7 @@ public class FilterFragment extends Fragment {
         mathButton = getActivity().findViewById(R.id.filterButtonMath);
         scienceButton = getActivity().findViewById(R.id.filterButtonScience);
         computerScienceButton = getActivity().findViewById(R.id.filterButtonComputerScience);
+        sportsButton = getActivity().findViewById(R.id.filterButtonSports);
         saveButton = getActivity().findViewById(R.id.saveButton);
 
         // setting button view
@@ -50,6 +54,7 @@ public class FilterFragment extends Fragment {
         setButtonView(mathButton, mathBool);
         setButtonView(scienceButton, scienceBool);
         setButtonView(computerScienceButton, computerScienceBool);
+        setButtonView(sportsButton, sportsBool);
 
         artsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,6 +98,15 @@ public class FilterFragment extends Fragment {
                 changeFilterStatus(computerScienceButton, computerScienceBool);
                 setButtonView(computerScienceButton, computerScienceBool);
                 passBackHM.put("Computer Science", computerScienceBool);
+                intermediateActivity.setUserClickCheck(true);
+            }
+        });
+        sportsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeFilterStatus(sportsButton, sportsBool);
+                setButtonView(sportsButton, sportsBool);
+                passBackHM.put("Sports", sportsBool);
                 intermediateActivity.setUserClickCheck(true);
             }
         });
@@ -146,6 +160,8 @@ public class FilterFragment extends Fragment {
                 button.setBackgroundResource(R.drawable.button_science_background);
             } else if (button == computerScienceButton) {
                 button.setBackgroundResource(R.drawable.button_computer_science_background);
+            } else if (button == sportsButton) {
+                button.setBackgroundResource(R.drawable.button_sports_background);
             }
         } else {
             button.setBackgroundResource(R.drawable.button_gray_background);
@@ -164,6 +180,8 @@ public class FilterFragment extends Fragment {
             scienceBool = !bool;
         } else if (button == computerScienceButton) {
             computerScienceBool = !bool;
+        } else if (button == sportsButton) {
+            sportsBool = !bool;
         }
     }
 
@@ -182,11 +200,13 @@ public class FilterFragment extends Fragment {
         mathBool = userFilterHM.get("Math");
         scienceBool = userFilterHM.get("Science");
         computerScienceBool = userFilterHM.get("Computer Science");
+        sportsBool = userFilterHM.get("Sports");
         passBackHM.put("Arts", artsBool);
         passBackHM.put("History", historyBool);
         passBackHM.put("Math", mathBool);
         passBackHM.put("Science", scienceBool);
         passBackHM.put("Computer Science", computerScienceBool);
+        passBackHM.put("Sports", sportsBool);
         return inflater.inflate(R.layout.fragment_filter, container, false);
     }
 
@@ -198,5 +218,6 @@ public class FilterFragment extends Fragment {
         outState.putBoolean("Math", mathBool);
         outState.putBoolean("Science", scienceBool);
         outState.putBoolean("Computer Science", computerScienceBool);
+        outState.putBoolean("Sports", sportsBool);
     }
 }

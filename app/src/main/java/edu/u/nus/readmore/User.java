@@ -26,6 +26,7 @@ public class User implements Serializable {
         userFilter.put("Math", true);
         userFilter.put("Science", true);
         userFilter.put("Computer Science", true);
+        userFilter.put("Sports", true);
     }
 
     public String getId() {
