@@ -19,6 +19,7 @@
     <string name="math">Math</string>
     <string name="science">Science</string>
     <string name="computer_science">Computer Science</string>
+    <string name="sports">Sports</string>
     <!-- Read History fragment -->
     <string name="empty_history">There doesn\'t seem to be anything here...</string>
     <!-- Values for edit profile fragment -->

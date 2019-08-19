@@ -91,6 +91,16 @@
                 android:paddingTop="48dp"
                 android:paddingBottom="48dp"
                 android:textSize="24sp" />
+            <Button
+                android:id="@+id/filterButtonSports"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/buttonHighlight"
+                android:text="@string/sports"
+                android:textColor="#FFFFFF"
+                android:paddingTop="48dp"
+                android:paddingBottom="48dp"
+                android:textSize="24sp" />
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>
