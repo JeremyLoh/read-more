@@ -1,4 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_7" project-jdk-name="1.8" project-jdk-type="JavaSDK" />
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="app/src/main/res/layout/activity_intermediate.xml" value="0.15070921985815602" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_onboardscreen.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_splash.xml" value="0.15045592705167174" />
+        <entry key="app/src/main/res/layout/fragment_edit_profile.xml" value="0.15045592705167174" />
+        <entry key="app/src/main/res/layout/fragment_filter.xml" value="0.15070921985815602" />
+        <entry key="app/src/main/res/layout/fragment_login.xml" value="0.15070921985815602" />
+        <entry key="app/src/main/res/layout/fragment_read_history.xml" value="0.15070921985815602" />
+        <entry key="app/src/main/res/layout/fragment_register.xml" value="0.15070921985815602" />
+        <entry key="app/src/main/res/layout/fragment_resetpassword.xml" value="0.15070921985815602" />
+        <entry key="app/src/main/res/layout/fragment_settings.xml" value="0.15070921985815602" />
+        <entry key="app/src/main/res/layout/layout_onboardscreen.xml" value="0.15045592705167174" />
+        <entry key="app/src/main/res/layout/nav_header.xml" value="0.15045592705167174" />
+        <entry key="app/src/main/res/layout/no_internet_connection.xml" value="0.15070921985815602" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK" />
 </project>
