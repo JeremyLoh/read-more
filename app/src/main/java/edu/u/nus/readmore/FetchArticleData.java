@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class FetchArticleData extends AsyncTask<String, Void, Map<String, String>> {
+    private final String MAX_IMAGE_SIZE_IN_PX = "1000";
     AsyncArticleResponse articleResponse = null;
     private Map<String, String> output = new HashMap<>();
 
@@ -159,10 +160,9 @@ public class FetchArticleData extends AsyncTask<String, Void, Map<String, String
         // action=query&format=json&prop=pageimages&pithumbsize=1000
         // &titles=Image:[IMAGE_FILE_TITLE]
         // Query image size max of 1000 (&pithumbsize=1000)
-        return "https://en.wikipedia.org/w/api.php?" +
-                "action=query&format=json" +
+        return "https://en.wikipedia.org/w/api.php?action=query&format=json" +
                 "&prop=pageimages" +
-                "&pithumbsize=1000" +
+                "&pithumbsize=" + MAX_IMAGE_SIZE_IN_PX +
                 "&titles=Image:" + imageTitle;
     }
 
@@ -173,11 +173,10 @@ public class FetchArticleData extends AsyncTask<String, Void, Map<String, String
         // https://en.wikipedia.org/w/api.php?action=query&format=json&pageids=23420193&prop=pageimages|images&pithumbsize=1000
         // Query with no valid thumbnail image (Example)
         // https://en.wikipedia.org/w/api.php?action=query&format=json&pageids=9127632&prop=pageimages|images&pithumbsize=1000
-        return "https://en.wikipedia.org/w/api.php?" +
-                "action=query&format=json" +
+        return "https://en.wikipedia.org/w/api.php?action=query&format=json" +
                 "&pageids=" + pageid +
                 "&prop=pageimages|images" +
-                "&pithumbsize=1000"; // set max image size obtained to be within 1000px
+                "&pithumbsize=" + MAX_IMAGE_SIZE_IN_PX;
     }
 
     // Returns a String representing a JSONObject
