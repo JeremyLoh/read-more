@@ -53,10 +53,8 @@ public class LoginFragment extends Fragment {
     private ProgressBar mProgressBar;
     private RelativeLayout loginRelativeLayout;
 
-    // flag for changing passwordVisibility
-    private boolean passwordFlag = false;
+    private boolean isPasswordVisible = false;
 
-    // Google sign in components
     private GoogleSignInOptions gso;
     private GoogleSignInClient mGoogleSignInClient;
 
@@ -66,17 +64,27 @@ public class LoginFragment extends Fragment {
     private static final int RC_SIGN_IN = 9001;
     private static final String TAG = "GoogleLoginActivity";
 
-    // Firebase components
     private FirebaseAuth mAuth;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         getActivity().setTitle("Login");
 
-        // Initialize buttons and TextViews
+        initializeFirebaseAuth();
+        initializeScreenButtons();
+        setupScreenViews();
+        setupGoogleSignIn();
+        hideKeyboardWhenFocusChanges();
+        setupButtons();
+    }
+
+    private void initializeFirebaseAuth() {
+        mAuth = FirebaseAuth.getInstance();
+    }
+
+    private void initializeScreenButtons() {
         textInputEmail = getActivity().findViewById(R.id.text_input_layout_email);
         textInputPassword = getActivity().findViewById(R.id.text_input_layout_password);
         forgotPW = getActivity().findViewById(R.id.tv_forgot_pwd);
@@ -84,10 +92,14 @@ public class LoginFragment extends Fragment {
         signUpBtn = getActivity().findViewById(R.id.signup_btn);
         loginBtn = getActivity().findViewById(R.id.login_btn);
         googleBtn = getActivity().findViewById(R.id.google_btn);
-        mAuth = FirebaseAuth.getInstance();
+    }
+
+    private void setupScreenViews() {
         mProgressBar = getActivity().findViewById(R.id.login_progress);
         loginRelativeLayout = getActivity().findViewById(R.id.login_relative_layout);
+    }
 
+    private void setupGoogleSignIn() {
         gso = new GoogleSignInOptions
                 .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -95,91 +107,89 @@ public class LoginFragment extends Fragment {
                 .build();
         // Build a GoogleSignInClient with the options specified by gso.
         mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
+    }
 
+    private void hideKeyboardWhenFocusChanges() {
         // Hide keyboard when user clicks on any part of relative layout
-        loginRelativeLayout.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                // Check if view is being clicked
-                if (hasFocus) {
-                    hideSoftKeyBoard(getActivity().getApplicationContext(), v);
-                }
+        loginRelativeLayout.setOnFocusChangeListener((view, hasFocus) -> {
+            // Check if view is being clicked
+            if (hasFocus) {
+                hideSoftKeyBoard(getActivity().getApplicationContext(), view);
             }
         });
+    }
 
-        //setting login button activity
-        loginBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Disable clicking upon login prevent crashing of app, will enable upon
-                // log in successfully or failure
-                mProgressBar.setVisibility(View.VISIBLE);
-                getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                // hide soft keyboard for better UI
-                hideSoftKeyBoard(getActivity().getApplicationContext(), getView().getRootView());
-                loginUser();
-            }
-        });
-
+    private void setupButtons() {
         final FragmentTransaction toRegFt = getActivity()
                 .getSupportFragmentManager()
                 .beginTransaction();
+        setupSignUpButton(toRegFt);
+        setupForgotPasswordButton(toRegFt);
+        setupLoginButton();
+        setupPasswordVisibilityButton();
+        setupGoogleLinkButton();
+    }
 
+    private void setupSignUpButton(FragmentTransaction toRegFt) {
         //setting sign-up button to RegisterFragment
-        signUpBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideSoftKeyBoard(getActivity().getApplicationContext(), getView().getRootView());
-                toRegFt.replace(R.id.intermediate_frame_layout, new RegisterFragment());
-                toRegFt.addToBackStack("Register");
-                toRegFt.commit();
-            }
+        signUpBtn.setOnClickListener(view -> {
+            hideSoftKeyBoard(getActivity().getApplicationContext(), getView().getRootView());
+            toRegFt.replace(R.id.intermediate_frame_layout, new RegisterFragment());
+            toRegFt.addToBackStack("Register");
+            toRegFt.commit();
         });
+    }
 
+    private void setupForgotPasswordButton(FragmentTransaction toRegFt) {
         //setting forgotPW button to ResetPasswordFragment
-        forgotPW.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideSoftKeyBoard(getActivity().getApplicationContext(), getView().getRootView());
-                toRegFt.replace(R.id.intermediate_frame_layout, new ResetPasswordFragment());
-                toRegFt.addToBackStack("ForgotPW");
-                toRegFt.commit();
-            }
+        forgotPW.setOnClickListener(view -> {
+            hideSoftKeyBoard(getActivity().getApplicationContext(), getView().getRootView());
+            toRegFt.replace(R.id.intermediate_frame_layout, new ResetPasswordFragment());
+            toRegFt.addToBackStack("ForgotPW");
+            toRegFt.commit();
         });
+    }
 
-        // setup of passwordVisibility button
-        passwordVisibilityBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (passwordFlag) {
-                    // set to hide password
-                    passwordFlag = false;
-                    passwordVisibilityBtn.setImageResource(R.drawable.ic_hide_password_24dp);
-                    // set input type to textPassword
-                    textInputPassword.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
-                            InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                } else {
-                    // set to show password
-                    passwordFlag = true;
-                    passwordVisibilityBtn.setImageResource(R.drawable.ic_show_password_24dp);
-                    // set input type to textVisiblePassword
-                    textInputPassword.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
-                            InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                }
-                // set cursor at end of EditText
-                textInputEmail.getEditText().setSelection(textInputEmail.getEditText().getText().length());
-                textInputPassword.getEditText().setSelection(textInputPassword.getEditText().getText().length());
-            }
+    private void setupLoginButton() {
+        loginBtn.setOnClickListener(view -> {
+            // Disable clicking upon login prevent crashing of app, will enable upon
+            // log in successfully or failure
+            mProgressBar.setVisibility(View.VISIBLE);
+            getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            // hide soft keyboard for better UI
+            hideSoftKeyBoard(getActivity().getApplicationContext(), getView().getRootView());
+            loginUser();
         });
+    }
 
-        //setting google-link button
-        googleBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideSoftKeyBoard(getActivity().getApplicationContext(), getView().getRootView());
-                signIn();
+    private void setupPasswordVisibilityButton() {
+        passwordVisibilityBtn.setOnClickListener(view -> {
+            if (isPasswordVisible) {
+                setPasswordField(R.drawable.ic_hide_password_24dp, InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            } else {
+                setPasswordField(R.drawable.ic_show_password_24dp, InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
             }
+            isPasswordVisible = !isPasswordVisible;
+            setCursorToTextEnd();
+        });
+    }
+
+    private void setPasswordField(int buttonImageResource, int passwordTextVariationType) {
+        passwordVisibilityBtn.setImageResource(buttonImageResource);
+        textInputPassword.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
+                passwordTextVariationType);
+    }
+
+    private void setCursorToTextEnd() {
+        textInputEmail.getEditText().setSelection(textInputEmail.getEditText().getText().length());
+        textInputPassword.getEditText().setSelection(textInputPassword.getEditText().getText().length());
+    }
+
+    private void setupGoogleLinkButton() {
+        googleBtn.setOnClickListener(view -> {
+            hideSoftKeyBoard(getActivity().getApplicationContext(), getView().getRootView());
+            signIn();
         });
     }
 
@@ -191,7 +201,7 @@ public class LoginFragment extends Fragment {
     // Method for logging in Users
     private boolean verifyLoginInput(String ID, String Password) {
         String emailRegex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
-        Boolean checker = true;
+        boolean checker = true;
 
         if (TextUtils.isEmpty(ID) || !ID.matches(emailRegex)) {
             textInputEmail.setError("Please enter a valid Email");
@@ -308,14 +318,12 @@ public class LoginFragment extends Fragment {
 
     private void updateUI(FirebaseUser account) {
         if (account == null) {
-            Toast
-                    .makeText(getActivity(),
+            Toast.makeText(getActivity(),
                             "Authentication failed, please try again",
                             Toast.LENGTH_SHORT)
                     .show();
         } else {
-            Toast
-                    .makeText(getActivity().getApplicationContext(),
+            Toast.makeText(getActivity().getApplicationContext(),
                             "Login Successful!",
                             Toast.LENGTH_SHORT)
                     .show();
