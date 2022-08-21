@@ -6,11 +6,9 @@ import androidx.annotation.NonNull;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
-import com.google.firebase.firestore.util.Util;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,6 +30,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+// Used to update db topics with text files placed in assets/ folder
 class UpdateDbTopics extends AsyncTask<Void, Void, Void> {
     private List<String> categoryFiles = new ArrayList<>(
             Arrays.asList("Sports.txt"));
@@ -42,74 +41,16 @@ class UpdateDbTopics extends AsyncTask<Void, Void, Void> {
         assetManager = context.getAssets();
     }
 
+    // For changing UI
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+    }
+
     @Override
     protected Void doInBackground(Void... voids) {
         try {
-            // Read txt file for topics
-            for (String fileName : categoryFiles) {
-                List<String> topicList = getTopicList(fileName);
-                // categoryName does not contain ".txt"
-                String categoryName = fileName.substring(0, fileName.length() - 4);
-                if (topicList != null) {
-                    // Read and store topics
-                    for (final String topic : topicList) {
-                        String data = "";
-                        String urlStr = "https://en.wikipedia.org/w/api.php?" +
-                                "action=query&format=json" +
-                                "&list=categorymembers" +
-                                "&cmlimit=max" +
-                                "&cmtype=page" +
-                                "&cmprop=ids" +
-                                "&cmtitle=Category:" + topic;
-                        URL url = new URL(urlStr);
-                        // create a connection for url
-                        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-                        InputStream inputStream = httpURLConnection.getInputStream();
-                        // Use BufferedReader to read data from InputStream
-                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                        String line = "";
-                        while (line != null) {
-                            line = bufferedReader.readLine();
-                            data += line;
-                        }
-                        // Parse data obtained
-                        JSONObject jsonObject = (new JSONObject(data)).getJSONObject("query");
-                        JSONArray jsonArray = jsonObject.getJSONArray("categorymembers");
-                        int jsonArrayLength = jsonArray.length();
-                        List<String> pageidArr = new ArrayList<>();
-
-                        for (int i = 0; i < jsonArrayLength; i++) {
-                            JSONObject obj = (JSONObject) jsonArray.get(i);
-                            pageidArr.add(obj.getString("pageid"));
-                        }
-
-                        if (pageidArr.size() == 0) {
-                            continue;
-                        }
-
-                        Map<String, Object> item = new HashMap<>();
-                        item.put("pageid", pageidArr);
-                        // generate random id
-                        item.put("ID", Util.autoId());
-
-                        db.collection(categoryName)
-                            .document(topic)
-                            .set(item, SetOptions.merge())
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.v("Complete", "Added " + topic);
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.v("Failed", e.toString());
-                                }
-                            });
-                    }
-                }
-            }
+            processTopicCategoryFiles();
         } catch (MalformedURLException e) {
             // if url given is invalid
             e.printStackTrace();
@@ -123,21 +64,91 @@ class UpdateDbTopics extends AsyncTask<Void, Void, Void> {
         return null;
     }
 
-    // For changing UI
-    @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
+    private void processTopicCategoryFiles() throws IOException, JSONException {
+        for (String fileName : categoryFiles) {
+            List<String> topics = getTopics(fileName);
+            if (topics == null) {
+                continue;
+            }
+            saveTopics(topics, getCategoryName(fileName));
+        }
     }
 
-    private List<String> getTopicList(String fileName) {
+    private List<String> getTopics(String fileName) {
         try (BufferedReader buffer = new BufferedReader(
                 new InputStreamReader(assetManager.open(fileName), StandardCharsets.UTF_8));
-            Stream<String> lines = buffer.lines()) {
+             Stream<String> lines = buffer.lines()) {
             return lines.collect(Collectors.toList());
         } catch (IOException e) {
-            Log.e("BufferedReader Error", e.toString());
+            Log.e("Could not get topics from file: " + fileName, e.toString());
         }
         // when reading has failed, return null
         return null;
+    }
+
+    private void saveTopics(List<String> topicList, String categoryName) throws IOException, JSONException {
+        for (final String topic : topicList) {
+            URL url = getTopicUrl(topic);
+            List<String> pageids = getPageIds(queryTopic(url));
+            if (pageids.size() == 0) {
+                continue;
+            }
+            saveTopicToDb(categoryName, topic, pageids);
+        }
+    }
+
+    @NonNull
+    private URL getTopicUrl(String topic) throws MalformedURLException {
+        String url = "https://en.wikipedia.org/w/api.php?" +
+                "action=query&format=json" +
+                "&list=categorymembers" +
+                "&cmlimit=max" +
+                "&cmtype=page" +
+                "&cmprop=ids" +
+                "&cmtitle=Category:" + topic;
+        return new URL(url);
+    }
+
+    @NonNull
+    private JSONObject queryTopic(URL url) throws IOException, JSONException {
+        StringBuilder data = new StringBuilder();
+        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+        try (InputStream inputStream = httpURLConnection.getInputStream();
+             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream))) {
+            String line = "";
+            while (line != null) {
+                line = bufferedReader.readLine();
+                data.append(line);
+            }
+        }
+        return new JSONObject(data.toString());
+    }
+
+    private void saveTopicToDb(String categoryName, String topic, List<String> pageids) {
+        DocumentReference document = db.collection(categoryName).document(topic);
+        Map<String, Object> item = new HashMap<>();
+        item.put("pageid", pageids);
+        item.put("ID", document.getId());
+        document.set(item, SetOptions.merge())
+                .addOnSuccessListener(aVoid -> Log.v("Complete", "Added " + topic))
+                .addOnFailureListener(e -> Log.v("Failed", e.toString()));
+    }
+
+    @NonNull
+    private List<String> getPageIds(JSONObject response) throws JSONException {
+        JSONObject query = response.getJSONObject("query");
+        JSONArray categoryMembers = query.getJSONArray("categorymembers");
+        List<String> pageids = new ArrayList<>();
+        for (int i = 0; i < categoryMembers.length(); i++) {
+            JSONObject obj = (JSONObject) categoryMembers.get(i);
+            pageids.add(obj.getString("pageid"));
+        }
+        return pageids;
+    }
+
+    @NonNull
+    private String getCategoryName(String fileName) {
+        // Remove file extension ".txt"
+        return fileName.substring(0, fileName.length() - 4);
     }
 }
