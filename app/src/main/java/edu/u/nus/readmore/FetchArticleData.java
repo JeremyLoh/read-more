@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 
 public class FetchArticleData extends AsyncTask<String, Void, Map<String, String>> {
     private final String MAX_IMAGE_SIZE_IN_PX = "1000";
-    AsyncArticleResponse articleResponse = null;
+    AsyncArticleResponse articleResponse;
     private Map<String, String> output = new HashMap<>();
 
     public FetchArticleData(AsyncArticleResponse asyncArticleResponse) {
@@ -45,37 +45,7 @@ public class FetchArticleData extends AsyncTask<String, Void, Map<String, String
             String thumbnailImageQuery = getThumbnailImageQuery(pageid);
             String imageData = queryURL(new URL(thumbnailImageQuery));
             JSONObject pageResult = parsePageResult(pageid, imageData);
-            if (hasExistingThumbnail(pageResult)) {
-                output.put("imageURL", getThumbnailUrl(pageResult));
-            } else {
-                // check for existing images JSONArray
-                if (hasImages(pageResult)) {
-                    // get title of first image file in images JSONArray,
-                    // to conduct a query for it
-                    JSONArray imageArray = pageResult.getJSONArray("images");
-                    int imageArraySize = imageArray.length();
-                    if (imageArraySize == 0) {
-                        // No image available
-                        output.put("imageURL", "");
-                    }
-                    if (imageArraySize >= 1) {
-                        // Obtain first image that has a valid extension (not svg)
-                        String imageTitle = getFirstValidImageTitle(imageArray);
-                        boolean foundValidImage = !imageTitle.equals("");
-                        if (foundValidImage) {
-                            String imageTitleQuery = getImageTitleQuery(imageTitle);
-                            JSONObject imageJSON = new JSONObject(queryURL(new URL(imageTitleQuery)));
-                            output.put("imageURL", getImageUrl(imageJSON));
-                        } else {
-                            // No image available
-                            output.put("imageURL", "");
-                        }
-                    }
-                } else {
-                    // No image available
-                    output.put("imageURL", "");
-                }
-            }
+            output.put("imageURL", getImageUrlFromArticle(pageResult));
             // fetch article query
             String articleQuery = "https://en.wikipedia.org/w/api.php?" +
                     "action=query&format=json" +
@@ -111,8 +81,32 @@ public class FetchArticleData extends AsyncTask<String, Void, Map<String, String
         return output;
     }
 
+    private String getImageUrlFromArticle(JSONObject page) throws JSONException, IOException {
+        if (hasExistingThumbnail(page)) {
+            return getThumbnailUrl(page);
+        } else if (hasImages(page)) {
+            return getImageUrl(page);
+        }
+        return "";
+    }
+
+    private String getImageUrl(JSONObject page) throws JSONException, IOException {
+        // get title of first image file in images JSONArray, to conduct a query for it
+        JSONArray images = page.getJSONArray("images");
+        if (images.length() == 0) {
+            return "";
+        }
+        String imageTitle = getFirstValidImageTitle(images);
+        if (imageTitle.equals("")) {
+            return "";
+        }
+        String imageTitleQuery = getImageTitleQuery(imageTitle);
+        JSONObject imageJSON = new JSONObject(queryURL(new URL(imageTitleQuery)));
+        return getImageUrlFromImageTitleQuery(imageJSON);
+    }
+
     @NonNull
-    private String getImageUrl(JSONObject image) throws JSONException {
+    private String getImageUrlFromImageTitleQuery(JSONObject image) throws JSONException {
         JSONObject imageQuery = image.getJSONObject("query");
         JSONObject imagePages = imageQuery.getJSONObject("pages");
         JSONObject pageInfo = imagePages.getJSONObject("-1");
@@ -124,12 +118,13 @@ public class FetchArticleData extends AsyncTask<String, Void, Map<String, String
     }
 
     private String getFirstValidImageTitle(JSONArray images) throws JSONException {
+        // Obtain first image that has a valid extension (not svg)
         String imageTitle = "";
         int size = images.length();
-        for (int index = 0; index < size; index++) {
-            JSONObject imageInfo = images.getJSONObject(index);
+        for (int i = 0; i < size; i++) {
+            JSONObject imageInfo = images.getJSONObject(i);
             String title = imageInfo.getString("title");
-            String imageExtension = title.substring(title.length() - 3);
+            String imageExtension = title.substring(title.length() - 3).toLowerCase();
             if (imageExtension.equals("jpg") || imageExtension.equals("png")) {
                 imageTitle = title;
                 break;
