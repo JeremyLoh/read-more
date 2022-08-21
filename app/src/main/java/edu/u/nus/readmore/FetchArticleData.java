@@ -19,6 +19,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FetchArticleData extends AsyncTask<String, Void, Map<String, String>> {
     AsyncArticleResponse articleResponse = null;
@@ -101,6 +103,9 @@ public class FetchArticleData extends AsyncTask<String, Void, Map<String, String
         } catch (JSONException e) {
             // for invalid JSONArray
             e.printStackTrace();
+        } catch (IOException e) {
+            // could not query url
+            e.printStackTrace();
         }
         return output;
     }
@@ -176,28 +181,24 @@ public class FetchArticleData extends AsyncTask<String, Void, Map<String, String
     }
 
     // Returns a String representing a JSONObject
-    private String queryURL(URL URL) {
+    private String queryURL(URL URL) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) URL.openConnection();
         try {
-            StringBuilder output = new StringBuilder();
-            // create a connection for URL
-            HttpURLConnection httpImageURLConnection = (HttpURLConnection) URL.openConnection();
-            InputStream inputImageStream = httpImageURLConnection.getInputStream();
-            // Use BufferedReader to read data from InputStream
-            BufferedReader imageBufferedReader = new BufferedReader(new InputStreamReader(inputImageStream));
-            String readContent = imageBufferedReader.readLine();
-            while (readContent != null) {
-                output.append(readContent);
-                readContent = imageBufferedReader.readLine();
-            }
-            return output.toString();
+            connection = (HttpURLConnection) URL.openConnection();
+            return getStreamContents(connection.getInputStream());
         } catch (MalformedURLException e) {
-            // if url given is invalid
             e.printStackTrace();
-        } catch (IOException e) {
-            // for invalid url.openConnection() function
-            e.printStackTrace();
+        } finally {
+            connection.disconnect();
         }
         return "";
+    }
+
+    private String getStreamContents(InputStream inputStream) throws IOException {
+        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(inputStream));
+             Stream<String> lines = buffer.lines()) {
+            return lines.collect(Collectors.joining());
+        }
     }
 
     @Override
