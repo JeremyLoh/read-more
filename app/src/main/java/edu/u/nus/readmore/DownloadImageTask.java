@@ -8,12 +8,13 @@ import android.widget.ImageView;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 
 class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-    ImageView imageView;
+    private WeakReference<ImageView> imageViewContext;
 
     public DownloadImageTask(ImageView imageView) {
-        this.imageView = imageView;
+        this.imageViewContext = new WeakReference<>(imageView);
     }
 
     @Override
@@ -26,12 +27,10 @@ class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
     protected Bitmap doInBackground(String... URL) {
         String imageURL = URL[0];
         Bitmap image = null;
-        try {
-            InputStream inputStream = new java.net.URL(imageURL).openStream();
+        try (InputStream inputStream = new java.net.URL(imageURL).openStream()) {
             image = BitmapFactory.decodeStream(inputStream);
         } catch (IOException e) {
-            // For InputStream exception
-            Log.e("Error", e.getMessage());
+            Log.e("Could not get image from url: " + imageURL, e.getMessage());
             e.printStackTrace();
         }
         return image;
@@ -39,6 +38,7 @@ class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
     @Override
     protected void onPostExecute(Bitmap bitmap) {
+        ImageView imageView = this.imageViewContext.get();
         imageView.setImageBitmap(bitmap);
         imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         MainActivity.getActivityInstance().enableImage();
