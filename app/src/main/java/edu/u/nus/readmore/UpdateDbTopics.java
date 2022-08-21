@@ -29,6 +29,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 class UpdateDbTopics extends AsyncTask<Void, Void, Void> {
     private List<String> categoryFiles = new ArrayList<>(
@@ -91,20 +93,20 @@ class UpdateDbTopics extends AsyncTask<Void, Void, Void> {
                         item.put("ID", Util.autoId());
 
                         db.collection(categoryName)
-                                .document(topic)
-                                .set(item, SetOptions.merge())
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Log.v("Complete", "Added " + topic);
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.v("Failed", e.toString());
-                                    }
-                                });
+                            .document(topic)
+                            .set(item, SetOptions.merge())
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.v("Complete", "Added " + topic);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.v("Failed", e.toString());
+                                }
+                            });
                     }
                 }
             }
@@ -128,27 +130,12 @@ class UpdateDbTopics extends AsyncTask<Void, Void, Void> {
     }
 
     private List<String> getTopicList(String fileName) {
-        BufferedReader bufferedReader = null;
-        try {
-            List<String> outputList = new ArrayList<>();
-            bufferedReader = new BufferedReader(
-                    new InputStreamReader(assetManager.open(fileName), StandardCharsets.UTF_8));
-            String line = bufferedReader.readLine();
-            while (line != null) {
-                outputList.add(line);
-                line = bufferedReader.readLine();
-            }
-            return outputList;
+        try (BufferedReader buffer = new BufferedReader(
+                new InputStreamReader(assetManager.open(fileName), StandardCharsets.UTF_8));
+            Stream<String> lines = buffer.lines()) {
+            return lines.collect(Collectors.toList());
         } catch (IOException e) {
             Log.e("BufferedReader Error", e.toString());
-        } finally {
-            if (bufferedReader != null) {
-                try {
-                    bufferedReader.close();
-                } catch (IOException e) {
-                    Log.e("BufferedReader Error", e.toString());
-                }
-            }
         }
         // when reading has failed, return null
         return null;
