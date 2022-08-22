@@ -80,7 +80,7 @@ public class LoginFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getActivity().setTitle("Login");
+        Objects.requireNonNull(getActivity()).setTitle("Login");
 
         initializeFirebaseAuth();
         initializeScreenButtons();
@@ -95,7 +95,7 @@ public class LoginFragment extends Fragment {
     }
 
     private void initializeScreenButtons() {
-        textInputEmail = getActivity().findViewById(R.id.text_input_layout_email);
+        textInputEmail = Objects.requireNonNull(getActivity()).findViewById(R.id.text_input_layout_email);
         textInputPassword = getActivity().findViewById(R.id.text_input_layout_password);
         forgotPW = getActivity().findViewById(R.id.tv_forgot_pwd);
         passwordVisibilityBtn = getActivity().findViewById(R.id.toggle_password_btn);
@@ -105,7 +105,7 @@ public class LoginFragment extends Fragment {
     }
 
     private void setupScreenViews() {
-        mProgressBar = getActivity().findViewById(R.id.login_progress);
+        mProgressBar = Objects.requireNonNull(getActivity()).findViewById(R.id.login_progress);
         loginRelativeLayout = getActivity().findViewById(R.id.login_relative_layout);
     }
 
@@ -116,21 +116,20 @@ public class LoginFragment extends Fragment {
                 .requestEmail()
                 .build();
         // Build a GoogleSignInClient with the options specified by gso.
-        mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
+        mGoogleSignInClient = GoogleSignIn.getClient(requireContext(), gso);
     }
 
     private void hideKeyboardWhenFocusChanges() {
         // Hide keyboard when user clicks on any part of relative layout
         loginRelativeLayout.setOnFocusChangeListener((view, hasFocus) -> {
-            // Check if view is being clicked
             if (hasFocus) {
-                hideSoftKeyBoard(getActivity().getApplicationContext(), view);
+                hideSoftKeyBoard(requireContext(), view);
             }
         });
     }
 
     private void setupButtons() {
-        final FragmentTransaction toRegFt = getActivity()
+        final FragmentTransaction toRegFt = Objects.requireNonNull(getActivity())
                 .getSupportFragmentManager()
                 .beginTransaction();
         setupSignUpButton(toRegFt);
@@ -143,7 +142,7 @@ public class LoginFragment extends Fragment {
     private void setupSignUpButton(FragmentTransaction toRegFt) {
         //setting sign-up button to RegisterFragment
         signUpBtn.setOnClickListener(view -> {
-            hideSoftKeyBoard(getActivity().getApplicationContext(), getView().getRootView());
+            hideSoftKeyBoard(requireContext(), Objects.requireNonNull(getView()).getRootView());
             toRegFt.replace(R.id.intermediate_frame_layout, new RegisterFragment());
             toRegFt.addToBackStack("Register");
             toRegFt.commit();
@@ -153,7 +152,7 @@ public class LoginFragment extends Fragment {
     private void setupForgotPasswordButton(FragmentTransaction toRegFt) {
         //setting forgotPW button to ResetPasswordFragment
         forgotPW.setOnClickListener(view -> {
-            hideSoftKeyBoard(getActivity().getApplicationContext(), getView().getRootView());
+            hideSoftKeyBoard(requireContext(), Objects.requireNonNull(getView()).getRootView());
             toRegFt.replace(R.id.intermediate_frame_layout, new ResetPasswordFragment());
             toRegFt.addToBackStack("ForgotPW");
             toRegFt.commit();
@@ -165,10 +164,12 @@ public class LoginFragment extends Fragment {
             // Disable clicking upon login prevent crashing of app, will enable upon
             // log in successfully or failure
             mProgressBar.setVisibility(View.VISIBLE);
-            getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            Objects.requireNonNull(getActivity())
+                    .getWindow()
+                    .setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
             // hide soft keyboard for better UI
-            hideSoftKeyBoard(getActivity().getApplicationContext(), getView().getRootView());
+            hideSoftKeyBoard(requireContext(), Objects.requireNonNull(getView()).getRootView());
             loginUser();
         });
     }
@@ -187,18 +188,20 @@ public class LoginFragment extends Fragment {
 
     private void setPasswordField(int buttonImageResource, int passwordTextVariationType) {
         passwordVisibilityBtn.setImageResource(buttonImageResource);
-        textInputPassword.getEditText().setInputType(InputType.TYPE_CLASS_TEXT |
-                passwordTextVariationType);
+        Objects.requireNonNull(textInputPassword.getEditText())
+                .setInputType(InputType.TYPE_CLASS_TEXT | passwordTextVariationType);
     }
 
     private void setCursorToTextEnd() {
-        textInputEmail.getEditText().setSelection(textInputEmail.getEditText().getText().length());
-        textInputPassword.getEditText().setSelection(textInputPassword.getEditText().getText().length());
+        Objects.requireNonNull(textInputEmail.getEditText())
+                .setSelection(textInputEmail.getEditText().getText().length());
+        Objects.requireNonNull(textInputPassword.getEditText())
+                .setSelection(textInputPassword.getEditText().getText().length());
     }
 
     private void setupGoogleLinkButton() {
         googleBtn.setOnClickListener(view -> {
-            hideSoftKeyBoard(getActivity().getApplicationContext(), getView().getRootView());
+            hideSoftKeyBoard(requireContext(), Objects.requireNonNull(getView()).getRootView());
             handleGoogleSignIn();
         });
     }
@@ -240,12 +243,12 @@ public class LoginFragment extends Fragment {
                     .addOnCompleteListener(task -> {
                         dismissProgressBar();
                         if (task.isSuccessful()) {
-                            Toast.makeText(getActivity().getApplicationContext(),
+                            Toast.makeText(requireContext(),
                                     "Login Successful!",
                                     Toast.LENGTH_SHORT).show();
-                            getActivity().finish();
+                            Objects.requireNonNull(getActivity()).finish();
                         } else {
-                            Toast.makeText(getActivity().getApplicationContext(),
+                            Toast.makeText(requireContext(),
                                     "Login unsuccessful, please try again",
                                     Toast.LENGTH_SHORT).show();
                         }
@@ -337,17 +340,17 @@ public class LoginFragment extends Fragment {
 
     private void updateUI(FirebaseUser account) {
         if (account == null) {
-            Toast.makeText(getActivity(),
+            Toast.makeText(requireContext(),
                             "Authentication failed, please try again",
                             Toast.LENGTH_SHORT)
                     .show();
         } else {
-            Toast.makeText(getActivity().getApplicationContext(),
+            Toast.makeText(requireContext(),
                             "Login Successful!",
                             Toast.LENGTH_SHORT)
                     .show();
             // Finishes intermediate, redirect to MainActivity
-            getActivity().finish();
+            Objects.requireNonNull(getActivity()).finish();
         }
     }
 }
