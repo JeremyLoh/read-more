@@ -243,20 +243,21 @@ public class LoginFragment extends Fragment {
                     .addOnCompleteListener(task -> {
                         dismissProgressBar();
                         if (task.isSuccessful()) {
-                            Toast.makeText(requireContext(),
-                                    "Login Successful!",
-                                    Toast.LENGTH_SHORT).show();
+                            displayShortToastMessage("Login Successful!");
                             Objects.requireNonNull(getActivity()).finish();
                         } else {
-                            Toast.makeText(requireContext(),
-                                    "Login unsuccessful, please try again",
-                                    Toast.LENGTH_SHORT).show();
+                            displayShortToastMessage("Login unsuccessful, please try again");
                         }
                     });
         } else {
             // failed input
             dismissProgressBar();
         }
+    }
+
+    private void displayShortToastMessage(String message) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT)
+                .show();
     }
 
     private void dismissProgressBar() {
@@ -340,15 +341,9 @@ public class LoginFragment extends Fragment {
 
     private void updateUI(FirebaseUser account) {
         if (account == null) {
-            Toast.makeText(requireContext(),
-                            "Authentication failed, please try again",
-                            Toast.LENGTH_SHORT)
-                    .show();
+            displayShortToastMessage("Authentication failed, please try again");
         } else {
-            Toast.makeText(requireContext(),
-                            "Login Successful!",
-                            Toast.LENGTH_SHORT)
-                    .show();
+            displayShortToastMessage("Login Successful!");
             // Finishes intermediate, redirect to MainActivity
             Objects.requireNonNull(getActivity()).finish();
         }
