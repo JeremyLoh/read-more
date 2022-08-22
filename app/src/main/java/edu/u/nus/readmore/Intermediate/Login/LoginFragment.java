@@ -68,6 +68,7 @@ public class LoginFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final String VALID_EMAIL_REGEX = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
 
     @Nullable
     @Override
@@ -211,48 +212,61 @@ public class LoginFragment extends Fragment {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    // Method for logging in Users
-    private boolean verifyLoginInput(String ID, String Password) {
-        String emailRegex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
-        boolean checker = true;
-
-        if (TextUtils.isEmpty(ID) || !ID.matches(emailRegex)) {
-            textInputEmail.setError("Please enter a valid Email");
-            checker = false;
-        } else {
-            textInputEmail.setError(null);
-        }
-        if (TextUtils.isEmpty(Password)) {
-            textInputPassword.setError("Please enter a Password");
-            checker = false;
-        } else {
-            textInputPassword.setError(null);
-        }
-        return checker;
-    }
-
     private void loginUser() {
-        String ID, Password;
-        ID = Objects.requireNonNull(textInputEmail.getEditText())
+        String id = Objects.requireNonNull(textInputEmail.getEditText())
                 .getText().toString();
-        Password = Objects.requireNonNull(textInputPassword.getEditText())
+        String password = Objects.requireNonNull(textInputPassword.getEditText())
                 .getText().toString();
-
-        if (verifyLoginInput(ID, Password)) {
-            mAuth.signInWithEmailAndPassword(ID, Password)
-                    .addOnCompleteListener(task -> {
-                        dismissProgressBar();
-                        if (task.isSuccessful()) {
-                            displayShortToastMessage("Login Successful!");
-                            Objects.requireNonNull(getActivity()).finish();
-                        } else {
-                            displayShortToastMessage("Login unsuccessful, please try again");
-                        }
-                    });
+        if (isValidLoginInput(id, password)) {
+            signInUsingEmailAndPassword(id, password);
         } else {
-            // failed input
+            displayLoginError(id, password);
             dismissProgressBar();
         }
+    }
+
+    private boolean isValidLoginInput(String id, String password) {
+        return isValidId(id) && isValidPassword(password);
+    }
+
+    private void signInUsingEmailAndPassword(String id, String password) {
+        mAuth.signInWithEmailAndPassword(id, password)
+                .addOnCompleteListener(task -> {
+                    dismissProgressBar();
+                    if (task.isSuccessful()) {
+                        displayShortToastMessage("Login Successful!");
+                        finishActivity();
+                    } else {
+                        displayShortToastMessage("Login unsuccessful, please try again");
+                    }
+                });
+    }
+
+    private void finishActivity() {
+        Objects.requireNonNull(getActivity()).finish();
+    }
+
+    private boolean isValidId(String id) {
+        return !TextUtils.isEmpty(id) && id.matches(VALID_EMAIL_REGEX);
+    }
+
+    private boolean isValidPassword(String password) {
+        return !TextUtils.isEmpty(password);
+    }
+
+    private void displayLoginError(String id, String password) {
+        displayIdError(id);
+        displayPasswordError(password);
+    }
+
+    private void displayIdError(String id) {
+        String error = isValidId(id) ? null : "Please enter a valid Email";
+        textInputEmail.setError(error);
+    }
+
+    private void displayPasswordError(String password) {
+        String error = isValidPassword(password) ? null : "Please enter a Password";
+        textInputPassword.setError(error);
     }
 
     private void displayShortToastMessage(String message) {
@@ -345,7 +359,7 @@ public class LoginFragment extends Fragment {
         } else {
             displayShortToastMessage("Login Successful!");
             // Finishes intermediate, redirect to MainActivity
-            Objects.requireNonNull(getActivity()).finish();
+            finishActivity();
         }
     }
 }
