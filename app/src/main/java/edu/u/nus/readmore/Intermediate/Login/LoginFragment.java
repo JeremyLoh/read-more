@@ -41,6 +41,8 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
+import java.util.Objects;
+
 import edu.u.nus.readmore.R;
 import edu.u.nus.readmore.User;
 
@@ -66,6 +68,14 @@ public class LoginFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_login, container, false);
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -189,7 +199,7 @@ public class LoginFragment extends Fragment {
     private void setupGoogleLinkButton() {
         googleBtn.setOnClickListener(view -> {
             hideSoftKeyBoard(getActivity().getApplicationContext(), getView().getRootView());
-            signIn();
+            handleGoogleSignIn();
         });
     }
 
@@ -220,26 +230,24 @@ public class LoginFragment extends Fragment {
 
     private void loginUser() {
         String ID, Password;
-        ID = textInputEmail.getEditText().getText().toString();
-        Password = textInputPassword.getEditText().getText().toString();
+        ID = Objects.requireNonNull(textInputEmail.getEditText())
+                .getText().toString();
+        Password = Objects.requireNonNull(textInputPassword.getEditText())
+                .getText().toString();
 
         if (verifyLoginInput(ID, Password)) {
             mAuth.signInWithEmailAndPassword(ID, Password)
-                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                dismissProgressBar();
-                                Toast.makeText(getActivity().getApplicationContext(),
-                                        "Login Successful!",
-                                        Toast.LENGTH_SHORT).show();
-                                getActivity().finish();
-                            } else {
-                                dismissProgressBar();
-                                Toast.makeText(getActivity().getApplicationContext(),
-                                        "Login unsuccessful, please try again",
-                                        Toast.LENGTH_SHORT).show();
-                            }
+                    .addOnCompleteListener(task -> {
+                        dismissProgressBar();
+                        if (task.isSuccessful()) {
+                            Toast.makeText(getActivity().getApplicationContext(),
+                                    "Login Successful!",
+                                    Toast.LENGTH_SHORT).show();
+                            getActivity().finish();
+                        } else {
+                            Toast.makeText(getActivity().getApplicationContext(),
+                                    "Login unsuccessful, please try again",
+                                    Toast.LENGTH_SHORT).show();
                         }
                     });
         } else {
@@ -250,11 +258,12 @@ public class LoginFragment extends Fragment {
 
     private void dismissProgressBar() {
         mProgressBar.setVisibility(View.GONE);
-        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        Objects.requireNonNull(getActivity())
+                .getWindow()
+                .clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
 
-    // Google Account Sign-in
-    private void signIn() {
+    private void handleGoogleSignIn() {
         // Clear default Google Sign in account
         mGoogleSignInClient.signOut();
         // Configure sign-in to request the user's ID, email address, and basic
@@ -266,7 +275,6 @@ public class LoginFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             // The Task returned from this call is always completed, no need to attach
@@ -275,7 +283,7 @@ public class LoginFragment extends Fragment {
             try {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
-                firebaseAuthWithGoogle(account);
+                authenticateGoogleSignInWithFirebase(account);
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Log.w(TAG, "Google sign in failed", e);
@@ -284,36 +292,47 @@ public class LoginFragment extends Fragment {
         }
     }
 
-    private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
+    private void authenticateGoogleSignInWithFirebase(GoogleSignInAccount account) {
         Log.d(TAG, "firebaseAuthWithGoogle: " + account.getId());
-        // Check user last logged inbefore? if frst time create a User document in database
+        // Check user last logged in before: if first time create a User document in database
         // else success login redirect back to homepage by doing finish()
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "signInWithCredential:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            // check user new or existing
-                            boolean isNewUser = task.getResult().getAdditionalUserInfo().isNewUser();
-                            // Create a User class and add user info into FireStore db
-                            if (isNewUser) {
-                                String ID = user.getUid();
-                                User newUser = new User(ID);
-                                db.collection("Users")
-                                        .document(ID)
-                                        .set(newUser, SetOptions.merge());
-                            }
-                            updateUI(user);
-                        } else {
-                            // Sign-in fails, display a message to the user.
-                            Log.d(TAG, "signInWithCredential:failure", task.getException());
-                            updateUI(null);
-                        }
-                    }
-                });
+                .addOnCompleteListener(Objects.requireNonNull(getActivity()), handleGoogleSignInWithFirebase());
+    }
+
+    @NonNull
+    private OnCompleteListener<AuthResult> handleGoogleSignInWithFirebase() {
+        return task -> {
+            if (task.isSuccessful()) {
+                Log.d(TAG, "signInWithCredential:success");
+                handleGoogleUserLogin(task);
+            } else {
+                // Sign-in fails, display a message to the user.
+                Log.d(TAG, "signInWithCredential:failure", task.getException());
+                updateUI(null);
+            }
+        };
+    }
+
+    private void handleGoogleUserLogin(Task<AuthResult> task) {
+        FirebaseUser user = mAuth.getCurrentUser();
+        boolean isNewUser = Objects.requireNonNull(task.getResult().getAdditionalUserInfo())
+                .isNewUser();
+        if (isNewUser) {
+            assert user != null;
+            createNewFirebaseUser(user);
+        }
+        updateUI(user);
+    }
+
+    private void createNewFirebaseUser(FirebaseUser user) {
+        assert user != null;
+        String ID = user.getUid();
+        User newUser = new User(ID);
+        db.collection("Users")
+                .document(ID)
+                .set(newUser, SetOptions.merge());
     }
 
     private void updateUI(FirebaseUser account) {
@@ -330,11 +349,5 @@ public class LoginFragment extends Fragment {
             // Finishes intermediate, redirect to MainActivity
             getActivity().finish();
         }
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_login, container, false);
     }
 }
