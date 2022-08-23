@@ -30,12 +30,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
+import java.util.Objects;
+
 import edu.u.nus.readmore.R;
 import edu.u.nus.readmore.User;
 
 public class RegisterFragment extends Fragment {
     private TextView alreadyMember;
-    private Button createAccBtn;
+    private Button createAccountBtn;
     private TextInputLayout textInputEmail, textInputPassword, textInputConfirmPassword;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -50,49 +52,62 @@ public class RegisterFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
     }
 
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_register, container, false);
+    }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getActivity().setTitle("Register");
+        setActivityTitle();
+        instantiateViewElements();
+        setupCreateAccountButton();
+        setupAlreadyMemberText();
+        setupHideKeyboardWhenFocusChanges();
+    }
 
-        // instantiate buttons and textview
-        alreadyMember = getActivity().findViewById(R.id.already_member);
-        createAccBtn = getActivity().findViewById(R.id.register_btn);
+    private void setActivityTitle() {
+        Objects.requireNonNull(getActivity()).setTitle("Register");
+    }
+
+    private void instantiateViewElements() {
+        alreadyMember = Objects.requireNonNull(getActivity()).findViewById(R.id.already_member);
+        createAccountBtn = getActivity().findViewById(R.id.register_btn);
         textInputEmail = getActivity().findViewById(R.id.text_input_email);
         textInputPassword = getActivity().findViewById(R.id.text_input_password);
         textInputConfirmPassword = getActivity().findViewById(R.id.text_input_confirm_password);
         mProgressBar = getActivity().findViewById(R.id.register_progress);
         registerRelativeLayout = getActivity().findViewById(R.id.register_account_relative_layout);
+    }
 
+    private void setupCreateAccountButton() {
         // create account and redirecting back to login fragment
-        createAccBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mProgressBar.setVisibility(View.VISIBLE);
-                // disable touch until progress finish
-                getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                hideKeyBoardFrom(getActivity().getApplicationContext(), getView().getRootView());
-                registerNewUser();
-            }
+        createAccountBtn.setOnClickListener(view -> {
+            mProgressBar.setVisibility(View.VISIBLE);
+            // disable touch until progress finish
+            Objects.requireNonNull(getActivity())
+                    .getWindow()
+                    .setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            hideKeyBoardFrom(requireContext(), Objects.requireNonNull(getView()).getRootView());
+            registerNewUser();
         });
+    }
 
-        alreadyMember.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideKeyBoardFrom(getActivity().getApplicationContext(), getView().getRootView());
-                backToLogin();
-            }
+    private void setupAlreadyMemberText() {
+        alreadyMember.setOnClickListener(view -> {
+            hideKeyBoardFrom(requireContext(), Objects.requireNonNull(getView()).getRootView());
+            backToLogin();
         });
+    }
 
+    private void setupHideKeyboardWhenFocusChanges() {
         // Hide keyboard when user clicks on any part of relative layout
-        registerRelativeLayout.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                // Check if view is being clicked
-                if (hasFocus) {
-                    hideSoftKeyBoard(getActivity().getApplicationContext(), v);
-                }
+        registerRelativeLayout.setOnFocusChangeListener((view, hasFocus) -> {
+            if (hasFocus) {
+                hideSoftKeyBoard(requireContext(), view);
             }
         });
     }
@@ -156,10 +171,7 @@ public class RegisterFragment extends Fragment {
                                 // verification email to the user
                                 Log.d(TAG, "createUserWithEmail:success");
                                 FirebaseUser user = mAuth.getCurrentUser();
-                                Toast.makeText(getActivity().getApplicationContext(),
-                                        "Welcome!",
-                                        Toast.LENGTH_SHORT)
-                                        .show();
+                                displayShortToastMessage("Welcome!");
 
                                 // add user to db
                                 String ID = user.getUid();
@@ -173,10 +185,7 @@ public class RegisterFragment extends Fragment {
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                                Toast.makeText(getActivity().getApplicationContext(),
-                                        "Authentication failed.",
-                                        Toast.LENGTH_SHORT)
-                                        .show();
+                                displayShortToastMessage("Authentication failed.");
                                 updateUI(null);
                                 dismissProgressBar();
                             }
@@ -188,20 +197,27 @@ public class RegisterFragment extends Fragment {
         }
     }
 
+    private void displayShortToastMessage(String message) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT)
+                .show();
+    }
+
     private void updateUI(FirebaseUser user) {
         if (user != null) {
             // Go back to MainActivity (Homepage)
-            getActivity().finish();
+            Objects.requireNonNull(getActivity()).finish();
         } else {
-            textInputEmail.getEditText().setText(null);
-            textInputPassword.getEditText().setText(null);
-            textInputConfirmPassword.getEditText().setText(null);
+            Objects.requireNonNull(textInputEmail.getEditText()).setText(null);
+            Objects.requireNonNull(textInputPassword.getEditText()).setText(null);
+            Objects.requireNonNull(textInputConfirmPassword.getEditText()).setText(null);
         }
     }
 
     // direct back to login page, previous fragment
     private void backToLogin() {
-        getActivity().getSupportFragmentManager().popBackStack();
+        Objects.requireNonNull(getActivity())
+                .getSupportFragmentManager()
+                .popBackStack();
     }
 
     // hide soft keyboard
@@ -212,12 +228,8 @@ public class RegisterFragment extends Fragment {
 
     private void dismissProgressBar() {
         mProgressBar.setVisibility(View.GONE);
-        getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_register, container, false);
+        Objects.requireNonNull(getActivity())
+                .getWindow()
+                .clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
 }
