@@ -44,11 +44,11 @@ public class RegisterFragment extends Fragment {
     private static final String TAG = "EmailPassword";
     private ProgressBar mProgressBar;
     private RelativeLayout registerRelativeLayout;
+    private final String VALID_EMAIL_REGEX = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
     }
 
@@ -83,17 +83,25 @@ public class RegisterFragment extends Fragment {
     }
 
     private void setupCreateAccountButton() {
-        // create account and redirecting back to login fragment
+        // create account and redirect back to login fragment
         createAccountBtn.setOnClickListener(view -> {
-            mProgressBar.setVisibility(View.VISIBLE);
+            showProgressBar();
             // disable touch until progress finish
-            Objects.requireNonNull(getActivity())
-                    .getWindow()
-                    .setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            disableTouchInput();
             hideKeyBoardFrom(requireContext(), Objects.requireNonNull(getView()).getRootView());
             registerNewUser();
         });
+    }
+
+    private void showProgressBar() {
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void disableTouchInput() {
+        Objects.requireNonNull(getActivity())
+                .getWindow()
+                .setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
     }
 
     private void setupAlreadyMemberText() {
@@ -117,84 +125,101 @@ public class RegisterFragment extends Fragment {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    private boolean validateForm() {
-        boolean validRegistration = true;
-        // check for valid email
-        String emailRegex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
-        String givenEmail = textInputEmail.getEditText().getText().toString();
-        String givenPassword = textInputPassword.getEditText().getText().toString();
-        String givenConfirmPassword = textInputConfirmPassword.getEditText().getText().toString();
-        // check for valid email given
-        if (TextUtils.isEmpty(givenEmail) || !givenEmail.matches(emailRegex)) {
-            textInputEmail.setError("Please enter a valid Email");
-            validRegistration = false;
-        } else {
-            textInputEmail.setError(null);
-        }
-
-        if (!givenPassword.equals(givenConfirmPassword)) {
-            textInputConfirmPassword.setError("Password given does not match");
-            validRegistration = false;
-        } else {
-            textInputConfirmPassword.setError(null);
-        }
-
-        // check password length is at least 8
-        if (givenPassword.isEmpty()) {
-            textInputPassword.setError("Password can't be empty!");
-            validRegistration = false;
-        } else if (givenPassword.length() < 8) {
-            textInputPassword.setError("Password needs to be at least 8 characters");
-            validRegistration = false;
-        } else {
-            textInputPassword.setError(null);
-        }
-        return validRegistration;
-    }
-
-    // creating new user account
     private void registerNewUser() {
-        if (validateForm()) {
-            // Create a new user account
-            final String givenEmail = textInputEmail.getEditText().getText().toString();
-            String givenPassword = textInputPassword.getEditText().getText().toString();
-
-            mAuth.createUserWithEmailAndPassword(givenEmail, givenPassword)
-                    .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                // Sign in success, update UI with the signed-in user's information
-                                // If the new account was created, the user is also signed in,
-                                // and the AuthStateListener runs the onAuthStateChanged callback.
-                                // In the callback, you can manage the work of sending the
-                                // verification email to the user
-                                Log.d(TAG, "createUserWithEmail:success");
-                                FirebaseUser user = mAuth.getCurrentUser();
-                                displayShortToastMessage("Welcome!");
-
-                                // add user to db
-                                String ID = user.getUid();
-                                User newUser = new User(ID);
-                                db.collection("Users")
-                                        .document(ID)
-                                        .set(newUser, SetOptions.merge());
-
-                                updateUI(user);
-                                dismissProgressBar();
-                            } else {
-                                // If sign in fails, display a message to the user.
-                                Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                                displayShortToastMessage("Authentication failed.");
-                                updateUI(null);
-                                dismissProgressBar();
-                            }
-                        }
-                    });
+        String email = getTextInput(textInputEmail);
+        String password = getTextInput(textInputPassword);
+        String confirmPassword = getTextInput(textInputConfirmPassword);
+        if (isValidNewUser(email, password, confirmPassword)) {
+            createNewUser(email, password);
         } else {
-            // failed input
+            displayErrorForInvalidNewUser(email, password, confirmPassword);
             dismissProgressBar();
         }
+    }
+
+    @NonNull
+    private String getTextInput(TextInputLayout textInputConfirmPassword) {
+        return Objects.requireNonNull(textInputConfirmPassword.getEditText())
+                .getText()
+                .toString();
+    }
+
+    private void createNewUser(String email, String password) {
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            // If the new account was created, the user is also signed in,
+                            // and the AuthStateListener runs the onAuthStateChanged callback.
+                            // In the callback, you can manage the work of sending the
+                            // verification email to the user
+                            Log.d(TAG, "createUserWithEmail:success");
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            displayShortToastMessage("Welcome!");
+                            // add user to db
+                            String ID = user.getUid();
+                            User newUser = new User(ID);
+                            db.collection("Users")
+                                    .document(ID)
+                                    .set(newUser, SetOptions.merge());
+                            clearRegisterForm();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                            displayShortToastMessage("Authentication failed.");
+                            navigateToHomepage();
+                        }
+                        dismissProgressBar();
+                    }
+                });
+    }
+
+    private void displayErrorForInvalidNewUser(String email, String password, String confirmPassword) {
+        String emailError = getErrorTextForInvalidEmail(email);
+        String passwordError = getErrorTextForInvalidPassword(password);
+        String confirmPasswordError = getErrorTextForInvalidConfirmPassword(password, confirmPassword);
+        textInputEmail.setError(emailError);
+        textInputPassword.setError(passwordError);
+        textInputConfirmPassword.setError(confirmPasswordError);
+    }
+
+    private String getErrorTextForInvalidEmail(String email) {
+        if (TextUtils.isEmpty(email) || !email.matches(VALID_EMAIL_REGEX)) {
+            return "Please enter a valid Email";
+        }
+        return null;
+    }
+
+    private String getErrorTextForInvalidPassword(String password) {
+        if (password.isEmpty()) {
+            return "Password can't be empty!";
+        }
+        if (password.length() < 8) {
+            return "Password needs to be at least 8 characters";
+        }
+        return null;
+    }
+
+    private String getErrorTextForInvalidConfirmPassword(String password, String confirmPassword) {
+        if (!password.equals(confirmPassword)) {
+            return "Password given does not match";
+        }
+        return null;
+    }
+
+    private boolean isValidNewUser(String email, String password, String confirmPassword) {
+        return isValidEmail(email) && isValidPassword(password, confirmPassword);
+    }
+
+    private boolean isValidEmail(String email) {
+        return !TextUtils.isEmpty(email) && email.matches(VALID_EMAIL_REGEX);
+    }
+
+    private boolean isValidPassword(String password, String confirmPassword) {
+        return !TextUtils.isEmpty(password) && password.equals(confirmPassword)
+                && password.length() >= 8;
     }
 
     private void displayShortToastMessage(String message) {
@@ -202,15 +227,14 @@ public class RegisterFragment extends Fragment {
                 .show();
     }
 
-    private void updateUI(FirebaseUser user) {
-        if (user != null) {
-            // Go back to MainActivity (Homepage)
-            Objects.requireNonNull(getActivity()).finish();
-        } else {
-            Objects.requireNonNull(textInputEmail.getEditText()).setText(null);
-            Objects.requireNonNull(textInputPassword.getEditText()).setText(null);
-            Objects.requireNonNull(textInputConfirmPassword.getEditText()).setText(null);
-        }
+    private void clearRegisterForm() {
+        Objects.requireNonNull(textInputEmail.getEditText()).setText(null);
+        Objects.requireNonNull(textInputPassword.getEditText()).setText(null);
+        Objects.requireNonNull(textInputConfirmPassword.getEditText()).setText(null);
+    }
+
+    private void navigateToHomepage() {
+        Objects.requireNonNull(getActivity()).finish();
     }
 
     // direct back to login page, previous fragment
@@ -227,9 +251,13 @@ public class RegisterFragment extends Fragment {
     }
 
     private void dismissProgressBar() {
-        mProgressBar.setVisibility(View.GONE);
+        hideProgressBar();
         Objects.requireNonNull(getActivity())
                 .getWindow()
                 .clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+    }
+
+    private void hideProgressBar() {
+        mProgressBar.setVisibility(View.GONE);
     }
 }
