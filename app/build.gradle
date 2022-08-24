@@ -37,4 +37,14 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.annotation:annotation:1.1.0' // for @androidx.annotation.Nullable in Article.java
     implementation 'androidx.multidex:multidex:2.0.0'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
+    androidTestImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
 }
