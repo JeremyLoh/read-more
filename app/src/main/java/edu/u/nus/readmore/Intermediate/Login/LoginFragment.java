@@ -45,6 +45,7 @@ import java.util.Objects;
 
 import edu.u.nus.readmore.R;
 import edu.u.nus.readmore.User;
+import edu.u.nus.readmore.Util.Validation.AccountValidator;
 
 public class LoginFragment extends Fragment {
     private TextInputLayout textInputEmail, textInputPassword;
@@ -68,7 +69,6 @@ public class LoginFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final String VALID_EMAIL_REGEX = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
 
     @Nullable
     @Override
@@ -247,7 +247,7 @@ public class LoginFragment extends Fragment {
     }
 
     private boolean isValidId(String id) {
-        return !TextUtils.isEmpty(id) && id.matches(VALID_EMAIL_REGEX);
+        return !TextUtils.isEmpty(id) && AccountValidator.isValidEmail(id);
     }
 
     private boolean isValidPassword(String password) {
