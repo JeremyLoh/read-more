@@ -160,49 +160,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setupToolbarAndAppDrawer();
         setupScreenElements();
 
-        retryInternetConnectionBtn.setOnClickListener((View v) -> {
-            if (hasInternetConnection()) {
-                // refresh main activity
-                Intent refreshActivity = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(refreshActivity);
-                finish();
-            }
-        });
-
+        setupRetryInternetConnectionBtn();
         // Initialise Firebase components
         mFirebaseAuth = FirebaseAuth.getInstance();
-        // Checking user status for displaying different menu options
-        mFirebaseAuthStateListener = (@NonNull FirebaseAuth firebaseAuth) -> {
-            FirebaseUser user = firebaseAuth.getCurrentUser();
-            if (user != null) {
-                // user is signed in
-                navigationView.getMenu().clear();
-                navigationView.inflateMenu(R.menu.drawer_menu_user);
-                isLoggedIn = true;
-                previousArticleBtn.setVisibility(View.VISIBLE);
-                navHeaderUserEmail.setText(user.getEmail());
-                if (currentUser == null) {
-                    setCurrentUser();
-                }
-            } else {
-                // user is signed out
-                navigationView.getMenu().clear();
-                navigationView.inflateMenu(R.menu.drawer_menu_login);
-                navHeaderUserEmail.setText(R.string.nav_header_guest);
-                isLoggedIn = false;
-                previousArticleBtn.setVisibility(View.GONE);
-                currentUser = null;
-                changedCurrentUser = false;
-            }
-            // declare that the options menu has changed, so should be recreated.
-            // calls onCreateOptionsMenu method when menu needs to be displayed again
-            invalidateOptionsMenu();
-        };
+        setupFirebaseAuthStateListener();
 
         // Add onClickListeners for article buttons
         nextArticleBtn.setOnClickListener((View v) -> {
             if (hasInternetConnection()) {
-                // misclicking prevention using threshold of 1000ms
                 if (isValidClick(1000)) {
                     lastClickTime = SystemClock.elapsedRealtime();
                     if (currentUser == null) {
@@ -317,6 +282,52 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private boolean isValidClick(int delay) {
         return SystemClock.elapsedRealtime() - lastClickTime > delay;
+    }
+
+    private void setupRetryInternetConnectionBtn() {
+        retryInternetConnectionBtn.setOnClickListener((View v) -> {
+            if (hasInternetConnection()) {
+                // refresh main activity
+                Intent refreshActivity = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(refreshActivity);
+                finish();
+            }
+        });
+    }
+
+    private void setupFirebaseAuthStateListener() {
+        mFirebaseAuthStateListener = (@NonNull FirebaseAuth firebaseAuth) -> {
+            FirebaseUser user = firebaseAuth.getCurrentUser();
+            if (user != null) {
+                setupUserNavigationView(user);
+                isLoggedIn = true;
+                if (currentUser == null) {
+                    setCurrentUser();
+                }
+            } else {
+                setupAnonymousNavigationView();
+                isLoggedIn = false;
+                currentUser = null;
+                changedCurrentUser = false;
+            }
+            // declare that the options menu has changed, so should be recreated
+            // calls onCreateOptionsMenu method when menu needs to be displayed again
+            invalidateOptionsMenu();
+        };
+    }
+
+    private void setupUserNavigationView(FirebaseUser user) {
+        navigationView.getMenu().clear();
+        navigationView.inflateMenu(R.menu.drawer_menu_user);
+        navHeaderUserEmail.setText(user.getEmail());
+        previousArticleBtn.setVisibility(View.VISIBLE);
+    }
+
+    private void setupAnonymousNavigationView() {
+        navigationView.getMenu().clear();
+        navigationView.inflateMenu(R.menu.drawer_menu_login);
+        navHeaderUserEmail.setText(R.string.nav_header_guest);
+        previousArticleBtn.setVisibility(View.GONE);
     }
 
     private void fetchMissingFilterCategories() {
