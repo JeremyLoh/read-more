@@ -144,30 +144,24 @@ public class OnBoardScreenActivity extends AppCompatActivity {
 
     @NonNull
     private View.OnClickListener getSkipIntroClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent mainActivityIntent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(mainActivityIntent);
-                skipTV.setClickable(false);
-                saveViewedOnboardingIntro();
-                finish();
-            }
+        return (View v) -> {
+            Intent mainActivityIntent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(mainActivityIntent);
+            skipTV.setClickable(false);
+            saveViewedOnboardingIntro();
+            finish();
         };
     }
 
     private View.OnClickListener getNextButtonClickListener(List<ScreenItem> screenItems) {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                position = screenPager.getCurrentItem();
-                if (position < screenItems.size()) {
-                    position++;
-                    screenPager.setCurrentItem(position);
-                }
-                if (position == screenItems.size() - 1) {
-                    loadLastScreen();
-                }
+        return (View v) -> {
+            position = screenPager.getCurrentItem();
+            if (position < screenItems.size()) {
+                position++;
+                screenPager.setCurrentItem(position);
+            }
+            if (position == screenItems.size() - 1) {
+                loadLastScreen();
             }
         };
     }
