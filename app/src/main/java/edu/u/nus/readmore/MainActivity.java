@@ -33,8 +33,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -138,20 +136,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             db.collection("Users")
                     .document(userID)
                     .set(currentUser)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            mFirebaseAuth.signOut();
-                        }
-                    });
+                    .addOnSuccessListener((Void aVoid) -> mFirebaseAuth.signOut());
             changedCurrentUser = false;
         } else {
             mFirebaseAuth.signOut();
         }
-        Toast
-                .makeText(this,
-                        "You have successfully signed out",
-                        Toast.LENGTH_SHORT)
+        Toast.makeText(this, "You have successfully signed out", Toast.LENGTH_SHORT)
                 .show();
     }
 
@@ -167,123 +157,86 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             UpdateDbTopics fd = new UpdateDbTopics(getApplicationContext());
             fd.execute();
         }
-        // Navigation drawer bar set-up
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        // Remove default app name placement on action bar
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        drawer = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
-                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+        setupToolbarAndAppDrawer();
+        setupScreenElements();
 
-        // Initialise article and toolbar components
-        articleTitleTextView = findViewById(R.id.articleTitleTextView);
-        articleContentTextView = findViewById(R.id.articleContentTextView);
-        articleImageView = findViewById(R.id.articleImageView);
-        previousArticleBtn = findViewById(R.id.previousArticleBtn);
-        nextArticleBtn = findViewById(R.id.nextArticleBtn);
-        articleScrollView = findViewById(R.id.articleScrollView);
-        progressBar = findViewById(R.id.progressBar);
-        navHeaderUserEmail = navigationView.getHeaderView(0).findViewById(R.id.nav_user_email);
-        noInternetConnectionView = findViewById(R.id.no_internet_connection_view);
-        retryInternetConnectionBtn = noInternetConnectionView.findViewById(R.id.retry_internet_connection_btn);
-
-        retryInternetConnectionBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // check for valid internet connection
-                if (hasInternetConnection()) {
-                    // refresh main activity
-                    Intent refreshActivity = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(refreshActivity);
-                    finish();
-                }
+        retryInternetConnectionBtn.setOnClickListener((View v) -> {
+            if (hasInternetConnection()) {
+                // refresh main activity
+                Intent refreshActivity = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(refreshActivity);
+                finish();
             }
         });
 
         // Initialise Firebase components
         mFirebaseAuth = FirebaseAuth.getInstance();
         // Checking user status for displaying different menu options
-        mFirebaseAuthStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // user is signed in
-                    navigationView.getMenu().clear();
-                    navigationView.inflateMenu(R.menu.drawer_menu_user);
-                    isLoggedIn = true;
-                    previousArticleBtn.setVisibility(View.VISIBLE);
-                    navHeaderUserEmail.setText(user.getEmail());
-                    if (currentUser == null) {
-                        setCurrentUser();
-                    }
-                } else {
-                    // user is signed out
-                    navigationView.getMenu().clear();
-                    navigationView.inflateMenu(R.menu.drawer_menu_login);
-                    navHeaderUserEmail.setText(R.string.nav_header_guest);
-                    isLoggedIn = false;
-                    previousArticleBtn.setVisibility(View.GONE);
-                    currentUser = null;
-                    changedCurrentUser = false;
+        mFirebaseAuthStateListener = (@NonNull FirebaseAuth firebaseAuth) -> {
+            FirebaseUser user = firebaseAuth.getCurrentUser();
+            if (user != null) {
+                // user is signed in
+                navigationView.getMenu().clear();
+                navigationView.inflateMenu(R.menu.drawer_menu_user);
+                isLoggedIn = true;
+                previousArticleBtn.setVisibility(View.VISIBLE);
+                navHeaderUserEmail.setText(user.getEmail());
+                if (currentUser == null) {
+                    setCurrentUser();
                 }
-                // declare that the options menu has changed, so should be recreated.
-                // calls onCreateOptionsMenu method when menu needs to be displayed again
-                invalidateOptionsMenu();
+            } else {
+                // user is signed out
+                navigationView.getMenu().clear();
+                navigationView.inflateMenu(R.menu.drawer_menu_login);
+                navHeaderUserEmail.setText(R.string.nav_header_guest);
+                isLoggedIn = false;
+                previousArticleBtn.setVisibility(View.GONE);
+                currentUser = null;
+                changedCurrentUser = false;
             }
+            // declare that the options menu has changed, so should be recreated.
+            // calls onCreateOptionsMenu method when menu needs to be displayed again
+            invalidateOptionsMenu();
         };
 
         // Add onClickListeners for article buttons
-        nextArticleBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        nextArticleBtn.setOnClickListener((View v) -> {
+            if (hasInternetConnection()) {
                 // misclicking prevention using threshold of 1000ms
-                // check for valid internet connection
-                if (hasInternetConnection()) {
-                    if (SystemClock.elapsedRealtime() - lastClickTime > 1000) {
-                        lastClickTime = SystemClock.elapsedRealtime();
-                        if (currentUser == null) {
-                            // Guest mode, random article generated, displayed
-                            getNewArticle();
+                if (isValidClick(1000)) {
+                    lastClickTime = SystemClock.elapsedRealtime();
+                    if (currentUser == null) {
+                        // Guest mode, random article generated, displayed
+                        getNewArticle();
+                    } else {
+                        Article nextArticle = currentUser.accessNextArticle();
+                        if (nextArticle != null) {
+                            currentArticle = nextArticle;
+                            displayArticle(currentArticle);
                         } else {
-                            Article nextArticle = currentUser.accessNextArticle();
-                            if (nextArticle != null) {
-                                currentArticle = nextArticle;
-                                displayArticle(currentArticle);
-                            } else {
-                                addToReadList(currentArticle);
-                                // Get new article, check user readList for duplicate article
-                                // Add to user readlist
-                                getNewArticle();
-                            }
-                            changedCurrentUser = true;
+                            addToReadList(currentArticle);
+                            // Get new article, check user readList for duplicate article
+                            // Add to user readlist
+                            getNewArticle();
                         }
+                        changedCurrentUser = true;
                     }
-                } else {
-                    noInternetConnectionView.setVisibility(View.VISIBLE);
-                    noInternetConnectionView.bringToFront();
                 }
+            } else {
+                noInternetConnectionView.setVisibility(View.VISIBLE);
+                noInternetConnectionView.bringToFront();
             }
         });
 
-        previousArticleBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // misclicking prevention using threshold of 1000ms
-                if (SystemClock.elapsedRealtime() - lastClickTime > 1000) {
-                    lastClickTime = SystemClock.elapsedRealtime();
-                    Article previousArticle = currentUser.accessPreviousArticle();
-                    if (previousArticle != null) {
-                        currentArticle = previousArticle;
-                        changedCurrentUser = true;
-                    }
-                    displayArticle(currentArticle);
+        previousArticleBtn.setOnClickListener((View v) -> {
+            if (isValidClick(1000)) {
+                lastClickTime = SystemClock.elapsedRealtime();
+                Article previousArticle = currentUser.accessPreviousArticle();
+                if (previousArticle != null) {
+                    currentArticle = previousArticle;
+                    changedCurrentUser = true;
                 }
+                displayArticle(currentArticle);
             }
         });
 
@@ -298,23 +251,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (firebaseUser != null && hasInternetConnection()) {
                 final String userID = firebaseUser.getUid();
                 DocumentReference userDoc = db.collection("Users").document(userID);
-                userDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        User user = documentSnapshot.toObject(User.class);
-                        currentUser = user;
-                        // Check read list for most recent Article
-                        if (currentUser != null) {
-                            Article latestArticle = currentUser.accessLatestArticle();
-                            if (latestArticle == null) {
-                                getNewArticle();
-                            } else {
-                                currentArticle = latestArticle;
-                                displayArticle(currentArticle);
-                            }
-                        } else {
+                userDoc.get().addOnSuccessListener((DocumentSnapshot documentSnapshot) -> {
+                    currentUser = documentSnapshot.toObject(User.class);
+                    // Check read list for most recent Article
+                    if (currentUser != null) {
+                        Article latestArticle = currentUser.accessLatestArticle();
+                        if (latestArticle == null) {
                             getNewArticle();
+                        } else {
+                            currentArticle = latestArticle;
+                            displayArticle(currentArticle);
                         }
+                    } else {
+                        getNewArticle();
                     }
                 });
             } else {
@@ -339,6 +288,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    private void setupScreenElements() {
+        articleTitleTextView = findViewById(R.id.articleTitleTextView);
+        articleContentTextView = findViewById(R.id.articleContentTextView);
+        articleImageView = findViewById(R.id.articleImageView);
+        previousArticleBtn = findViewById(R.id.previousArticleBtn);
+        nextArticleBtn = findViewById(R.id.nextArticleBtn);
+        articleScrollView = findViewById(R.id.articleScrollView);
+        progressBar = findViewById(R.id.progressBar);
+        navHeaderUserEmail = navigationView.getHeaderView(0).findViewById(R.id.nav_user_email);
+        noInternetConnectionView = findViewById(R.id.no_internet_connection_view);
+        retryInternetConnectionBtn = noInternetConnectionView.findViewById(R.id.retry_internet_connection_btn);
+    }
+
+    private void setupToolbarAndAppDrawer() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        // Remove default app name placement on action bar
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        drawer = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+    }
+
+    private boolean isValidClick(int delay) {
+        return SystemClock.elapsedRealtime() - lastClickTime > delay;
+    }
+
     private void fetchMissingFilterCategories() {
         Map<String, Boolean> userFilter = currentUser.getUserFilter();
         boolean needToUpdateDB = false;
@@ -358,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void setDayNightTheme() {
         SharedPreferences prefs = getSharedPreferences("myTheme", MODE_PRIVATE);
-        Boolean isNightTheme = prefs.getBoolean("isNightTheme", false);
+        boolean isNightTheme = prefs.getBoolean("isNightTheme", false);
         if (isNightTheme) {
             setTheme(R.style.AppThemeDark_NoActionBar);
         } else {
@@ -371,9 +351,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ConnectivityManager connectivityManager = (ConnectivityManager)
                 this.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null &&
+        return activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
-        return isConnected;
     }
 
     private void setCurrentUser() {
@@ -383,16 +362,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             // Logged in
             final String userID = firebaseUser.getUid();
             DocumentReference userDoc = db.collection("Users").document(userID);
-            userDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                @Override
-                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                    User user = documentSnapshot.toObject(User.class);
-                    currentUser = user;
-                    Article latestArticle = currentUser.accessLatestArticle();
-                    if (latestArticle != null) {
-                        currentArticle = latestArticle;
-                        displayArticle(latestArticle);
-                    }
+            userDoc.get().addOnSuccessListener((DocumentSnapshot documentSnapshot) -> {
+                currentUser = documentSnapshot.toObject(User.class);
+                Article latestArticle = currentUser.accessLatestArticle();
+                if (latestArticle != null) {
+                    currentArticle = latestArticle;
+                    displayArticle(latestArticle);
                 }
             });
         } else {
@@ -429,25 +404,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         CollectionReference topicRef = db.collection(randomTopic);
         Query subTopic;
         subTopic = topicRef.whereGreaterThanOrEqualTo("ID", checker).limit(1);
-        subTopic.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    List<DocumentSnapshot> documentList = task.getResult().getDocuments();
+        subTopic.get().addOnCompleteListener((@NonNull Task<QuerySnapshot> task) -> {
+            if (task.isSuccessful()) {
+                List<DocumentSnapshot> documentList = task.getResult().getDocuments();
 
-                    if (documentList == null || documentList.size() == 0) {
-                        getNewArticle();
-                    } else {
-                        DocumentSnapshot document = documentList.get(0);
-                        Map<String, Object> docContent = document.getData();
-                        List<String> listOfPageID = (List<String>) (docContent.get("pageid"));
-                        int randomIndex = new Random().nextInt(listOfPageID.size());
-                        String pageid = listOfPageID.get(randomIndex);
-                        generateArticleContent(pageid);
-                    }
-                } else {
+                if (documentList == null || documentList.size() == 0) {
                     getNewArticle();
+                } else {
+                    DocumentSnapshot document = documentList.get(0);
+                    Map<String, Object> docContent = document.getData();
+                    List<String> listOfPageID = (List<String>) (docContent.get("pageid"));
+                    int randomIndex = new Random().nextInt(listOfPageID.size());
+                    String pageid = listOfPageID.get(randomIndex);
+                    generateArticleContent(pageid);
                 }
+            } else {
+                getNewArticle();
             }
         });
     }
@@ -522,15 +494,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void browserDirectView(View view, final String URL) {
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent viewIntent =
-                        new Intent("android.intent.action.VIEW",
-                                Uri.parse(URL));
-                viewIntent.addCategory(Intent.CATEGORY_BROWSABLE);
-                startActivity(viewIntent);
-            }
+        view.setOnClickListener((View v) -> {
+            Intent viewIntent =
+                    new Intent("android.intent.action.VIEW",
+                            Uri.parse(URL));
+            viewIntent.addCategory(Intent.CATEGORY_BROWSABLE);
+            startActivity(viewIntent);
         });
     }
 
@@ -571,12 +540,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .setTitle("Logout")
                         .setMessage("Do you want to logout?")
                         .setCancelable(true)
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                logout();
-                            }
-                        })
+                        .setPositiveButton("Yes", (DialogInterface dialog, int which) -> logout())
                         .setNegativeButton("No", null)
                         .show();
                 break;
@@ -641,13 +605,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .setTitle("Quit")
                     .setMessage("Are you sure?")
                     .setCancelable(true)
-                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finish();
-                        }
-                    })
+                    .setPositiveButton("Yes", (DialogInterface dialog, int which) -> finish())
                     .setNegativeButton("No", null)
                     .show();
         }
