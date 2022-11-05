@@ -34,6 +34,7 @@ import java.util.Objects;
 
 import edu.u.nus.readmore.R;
 import edu.u.nus.readmore.User;
+import edu.u.nus.readmore.Util.Validation.AccountValidator;
 
 public class RegisterFragment extends Fragment {
     private TextView alreadyMember;
@@ -44,7 +45,6 @@ public class RegisterFragment extends Fragment {
     private static final String TAG = "EmailPassword";
     private ProgressBar mProgressBar;
     private RelativeLayout registerRelativeLayout;
-    private final String VALID_EMAIL_REGEX = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -186,7 +186,7 @@ public class RegisterFragment extends Fragment {
     }
 
     private String getErrorTextForInvalidEmail(String email) {
-        if (TextUtils.isEmpty(email) || !email.matches(VALID_EMAIL_REGEX)) {
+        if (TextUtils.isEmpty(email) || !AccountValidator.isValidEmail(email)) {
             return "Please enter a valid Email";
         }
         return null;
@@ -210,11 +210,7 @@ public class RegisterFragment extends Fragment {
     }
 
     private boolean isValidNewUser(String email, String password, String confirmPassword) {
-        return isValidEmail(email) && isValidPassword(password, confirmPassword);
-    }
-
-    private boolean isValidEmail(String email) {
-        return !TextUtils.isEmpty(email) && email.matches(VALID_EMAIL_REGEX);
+        return AccountValidator.isValidEmail(email) && isValidPassword(password, confirmPassword);
     }
 
     private boolean isValidPassword(String password, String confirmPassword) {
