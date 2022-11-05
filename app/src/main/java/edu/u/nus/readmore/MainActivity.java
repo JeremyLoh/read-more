@@ -92,11 +92,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         optionsMenu = menu;
         logoutItem = optionsMenu.findItem(R.id.logout_item);
-        if (isLoggedIn) {
-            logoutItem.setVisible(true);
-        } else {
-            logoutItem.setVisible(false);
-        }
+        logoutItem.setVisible(isLoggedIn);
         return true;
     }
 
@@ -104,33 +100,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (hasInternetConnection()) {
-            switch (item.getItemId()) {
-                case R.id.logout_item:
-                    new AlertDialog.Builder(this)
-                            .setTitle("Logout")
-                            .setMessage("Do you want to logout?")
-                            .setCancelable(true)
-                            .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    logout();
-                                }
-                            })
-                            .setNegativeButton("No", null)
-                            .show();
-                    break;
-                case R.id.toolbar_share_item:
-                    Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-                    sharingIntent.setType("text/plain");
-                    String shareTitle = currentArticle.getTitle();
-                    String shareBody = currentArticle.getUrl();
-                    sharingIntent.putExtra(Intent.EXTRA_SUBJECT, shareTitle);
-                    sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
-                    startActivity(Intent.createChooser(sharingIntent, "Share Using"));
-                    break;
+            int menuItemId = item.getItemId();
+            if (menuItemId == R.id.logout_item) {
+                showLogoutDialog();
+            } else if (menuItemId == R.id.toolbar_share_item) {
+                startActivity(Intent.createChooser(getSharingIntent(currentArticle), "Share Using"));
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showLogoutDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Logout")
+                .setMessage("Do you want to logout?")
+                .setCancelable(true)
+                .setPositiveButton("Yes", (DialogInterface dialog, int which) -> logout())
+                .setNegativeButton("No", null)
+                .show();
+    }
+
+    @NonNull
+    private Intent getSharingIntent(Article article) {
+        String shareTitle = article.getTitle();
+        String shareBody = article.getUrl();
+        Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+        sharingIntent.setType("text/plain");
+        sharingIntent.putExtra(Intent.EXTRA_SUBJECT, shareTitle);
+        sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+        return sharingIntent;
     }
 
     private void logout() {
